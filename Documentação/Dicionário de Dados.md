@@ -8,7 +8,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | **[ArmaBranca](#entidade-armabranca)** | **[InstanciaItens](#entidade-instanciaitens)** | **[Arma_de_Fogo](#entidade-arma_de_fogo)**|
 |**[Inventario](#entidade-inventario)** |**[Locais](#entidade-locais)** | **[AparecemEm (Itens)](#entidade-aparecemem-itens)** |
 | **[Zumbi](#entidade-zumbi)** | **[AparecemEm (Zumbi)](#entidade-aparecemem-zumbis)** | **[Missões](#entidade-missões)** |
-|**[Dialogos](#entidade-dialogos)** | **[Contem (Dialogo-Mensagem)](#entidade-contem-diálogo-mensagem)** |**[MensagemDialogo]**(#entidade-mensagemdialogo)  |
+|**[Dialogos](#entidade-dialogos)** | **[Contem (Dialogo-Mensagem)](#entidade-contem-diálogo-mensagem)** |**[MensagemDialogo](#entidade-mensagemdialogo)** |
 |**[GatilhoDialogo](#entidade-gatilhodialogo)** | **[ÉAtivadoPor](#entidade-éativadopor)** | **[InterageCom](#entidade-interagecom)** |
 
 
