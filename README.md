@@ -1,6 +1,9 @@
 # 🧟‍♂️ Projeto RPG Zumbi — Modelagem de Banco de Dados 2025.1
 Repositorio destinado a elaboração do trabalhando de Sistemas de Bancos de Dados 1
 
+## entregas
+### Entrega 1 https://youtu.be/VV2hEdlKEuM
+
 
 ## Grupo 10
 <table>
