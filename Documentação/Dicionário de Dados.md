@@ -8,8 +8,8 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | **[ArmaBranca](#entidade-armabranca)** | **[InstanciaItens](#entidade-instanciaitens)** | **[Arma_de_Fogo](#entidade-arma_de_fogo)**|
 |**[Inventario](#entidade-inventario)** |**[Locais](#entidade-locais)** | **[AparecemEm (Itens)](#entidade-aparecemem-itens)** |
 | **[Zumbi](#entidade-zumbi)** | **[AparecemEm (Zumbi)](#entidade-aparecemem-zumbis)** | **[Missões](#entidade-missões)** |
-|**[Dialogos](#entidade-dialogos)** | **[Contem (Dialogo-Mensagem)](#entidade-contem-diálogo-mensagem)** | **[InterageCom](#entidade-interagecom)** |
-|**[GatilhoDialogo](#entidade-gatilhodialogo)** | **[ÉAtivadoPor](#entidade-éativadopor)** |
+|**[Dialogos](#entidade-dialogos)** | **[Contem (Dialogo-Mensagem)](#entidade-contem-diálogo-mensagem)** |**[MensagemDialogo]**(#entidade-mensagemdialogo)  |
+|**[GatilhoDialogo](#entidade-gatilhodialogo)** | **[ÉAtivadoPor](#entidade-éativadopor)** | **[InterageCom](#entidade-interagecom)** |
 
 
 ## Entidade: Conta
@@ -35,9 +35,9 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | ------------ | ------- | ------- | --------------------------------- | ------------- |
 | IDPersonagem | integer |         | Identificador único do personagem | PK / Identity |
 | Nome         | varchar |         | Nome do personagem                | Not Null      |
-| Nivel        | integer |         | Nível do personagem               | Not Null      |
+| Nivel        | integer |         | Nível do personagem em XP         | Not Null      |
 | VidaMaxima   | integer |         | Vida máxima do personagem         | Not Null      |
-| VidaAtual    | integer |         | Vida atual do personagem          | Not Null      |
+| VidaAtual    | integer |         | Vida atual do personagem em porcentagem   | Not Null      |
 | IDConta      | integer |         | Chave estrangeira para Conta      | FK            |
 | IDInventario | integer |         | Chave estrangeira para Inventário | FK            |
 
@@ -142,8 +142,8 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | Campo    | Tipo    | Tamanho | Descrição                    | Restrições    |
 | -------- | ------- | ------- | ---------------------------- | ------------- |
 | IDZumbi  | integer |         | Identificador único do zumbi | PK / Identity |
-| Nivel    | integer |         | Nível do zumbi               | Not Null      |
-| DanoBase | integer |         | Dano base do zumbi           | Not Null      |
+| Nivel    | integer |         | Nível do zumbi em XP         | Not Null      |
+| DanoBase | integer |         | Dano base do zumbi em porcentagem  | Not Null      |
 
 
 
@@ -186,6 +186,18 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | IDDialogo | integer |         | Identificador único do diálogo | PK / Identity |
 | Titulo    | varchar |         | Título do diálogo              | Not Null      |
 
+
+
+## Entidade: MensagemDialogo
+**Descrição**: Contém as mensagens que ocorrem em um diálogo.
+
+**Observações**: Relaciona-se com a tabela Contem.
+
+| Campo     | Tipo    | Tamanho | Descrição                      | Restrições    |
+| --------- | ------- | ------- | ------------------------------ | ------------- |
+| IDMensagemDialogo | integer |         | Identificador único do diálogo | PK / Identity |
+| Texto    | varchar |         | Texto da mensagem              | Not Null      |
+| OrdemExibicao    | integer |         | Diz em que ordem uma mensagem está por meio de um inteiro     | Not Null      |
 
 
 ## Entidade: Contem (Diálogo-Mensagem)
