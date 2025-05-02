@@ -27,8 +27,9 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 
 ## Entidade: Personagem
-Descrição: Armazena os dados dos personagens dos jogadores.
-Observações: Associado à Conta e à Inventário.
+**Descrição**: Armazena os dados dos personagens dos jogadores.
+
+**Observações**: Associado à Conta e à Inventário.
 
 | Campo        | Tipo    | Tamanho | Descrição                         | Restrições    |
 | ------------ | ------- | ------- | --------------------------------- | ------------- |
@@ -43,8 +44,9 @@ Observações: Associado à Conta e à Inventário.
 
 
 ## Entidade: ClasseItens
-Descrição: Define categorias e atributos base para itens do jogo.
-Observações: Há especializações para armas de fogo e armas brancas.
+**Descrição**: Define categorias e atributos base para itens do jogo.
+
+**Observações**: Há especializações para armas de fogo e armas brancas.
 
 | Campo         | Tipo    | Tamanho | Descrição                             | Restrições    |
 | ------------- | ------- | ------- | ------------------------------------- | ------------- |
@@ -56,8 +58,9 @@ Observações: Há especializações para armas de fogo e armas brancas.
 
 
 ## Entidade: Arma_de_Fogo
-Descrição: Define atributos específicos de armas de fogo.
-Observações: Especialização de ClasseItens.
+**Descrição**: Define atributos específicos de armas de fogo.
+
+**Observações**: Especialização de ClasseItens.
 
 | Campo         | Tipo    | Tamanho | Descrição                          | Restrições |
 | ------------- | ------- | ------- | ---------------------------------- | ---------- |
@@ -68,8 +71,9 @@ Observações: Especialização de ClasseItens.
 
 
 ## Entidade: ArmaBranca
-Descrição: Define atributos específicos de armas brancas.
-Observações: Especialização de ClasseItens.
+**Descrição**: Define atributos específicos de armas brancas.
+
+**Observações**: Especialização de ClasseItens.
 
 | Campo         | Tipo    | Tamanho | Descrição                          | Restrições |
 | ------------- | ------- | ------- | ---------------------------------- | ---------- |
@@ -80,8 +84,9 @@ Observações: Especialização de ClasseItens.
 
 
 ## Entidade: InstanciaItens
-Descrição: Registra itens específicos no mundo do jogo.
-Observações: Relaciona-se com classes_itens e inventário.
+**Descrição**: Registra itens específicos no mundo do jogo.
+
+**Observações**: Relaciona-se com classes_itens e inventário.
 
 | Campo            | Tipo    | Tamanho | Descrição                                             | Restrições    |
 | ---------------- | ------- | ------- | ----------------------------------------------------- | ------------- |
@@ -94,8 +99,9 @@ Observações: Relaciona-se com classes_itens e inventário.
 
 
 ## Entidade: Inventario
-Descrição: Gerencia itens pertencentes a personagens.
-Observações: Cada personagem possui um inventário.
+**Descrição**: Gerencia itens pertencentes a personagens.
+
+**Observações**: Cada personagem possui um inventário.
 
 | Campo            | Tipo    | Tamanho | Descrição                         | Restrições    |
 | ---------------- | ------- | ------- | --------------------------------- | ------------- |
@@ -105,8 +111,9 @@ Observações: Cada personagem possui um inventário.
 
 
 ## Entidade: Locais
-Descrição: Descreve áreas do mapa do jogo.
-Observações: Relacionado a personagens, zumbis e itens.
+**Descrição**: Descreve áreas do mapa do jogo.
+
+**Observações**: Relacionado a personagens, zumbis e itens.
 
 | Campo        | Tipo    | Tamanho | Descrição                         | Restrições    |
 | ------------ | ------- | ------- | --------------------------------- | ------------- |
@@ -118,8 +125,9 @@ Observações: Relacionado a personagens, zumbis e itens.
 
 
 ## Entidade: AparecemEm (Itens)
-Descrição: Relaciona itens instanciados com locais.
-Observações: Relacionamento entre InstanciasItens e Locais
+**Descrição**: Relaciona itens instanciados com locais.
+
+**Observações**: Relacionamento entre InstanciasItens e Locais
 
 | Campo            | Tipo    | Tamanho | Descrição                             | Restrições |
 | ---------------- | ------- | ------- | ------------------------------------- | ---------- |
@@ -129,8 +137,9 @@ Observações: Relacionamento entre InstanciasItens e Locais
 
 
 ## Entidade: Zumbi
-Descrição: Registra zumbis no jogo e seus atributos.
-Observações: Relacionado a Locais.
+**Descrição**: Registra zumbis no jogo e seus atributos.
+
+**Observações**: Relacionado a Locais.
 
 | Campo    | Tipo    | Tamanho | Descrição                    | Restrições    |
 | -------- | ------- | ------- | ---------------------------- | ------------- |
@@ -141,8 +150,9 @@ Observações: Relacionado a Locais.
 
 
 ## Entidade: AparecemEm (Zumbis)
-Descrição: Relaciona zumbis com locais.
-Observações: Ligação entre Zumbi e Locais.
+**Descrição**: Relaciona zumbis com locais.
+
+**Observações**: Ligação entre Zumbi e Locais.
 
 | Campo   | Tipo    | Tamanho | Descrição                    | Restrições |
 | ------- | ------- | ------- | ---------------------------- | ---------- |
@@ -152,8 +162,9 @@ Observações: Ligação entre Zumbi e Locais.
 
 
 ## Entidade: Missões
-Descrição: Define missões disponíveis no jogo.
-Observações: Relacionada a Personagem e Locais.
+**Descrição**: Define missões disponíveis no jogo.
+
+**Observações**: Relacionada a Personagem e Locais.
 
 | Campo        | Tipo    | Tamanho | Descrição                          | Restrições    |
 | ------------ | ------- | ------- | ---------------------------------- | ------------- |
@@ -168,8 +179,9 @@ Observações: Relacionada a Personagem e Locais.
 
 
 ## Entidade: Dialogos
-Descrição: Armazena diálogos do jogo (NPCs, tutoriais, etc.).
-Observações: Relacionado a interações e mensagens.
+**Descrição**: Armazena diálogos do jogo (NPCs, tutoriais, etc.).
+
+**Observações**: Relacionado a interações e mensagens.
 
 | Campo     | Tipo    | Tamanho | Descrição                      | Restrições    |
 | --------- | ------- | ------- | ------------------------------ | ------------- |
@@ -179,8 +191,9 @@ Observações: Relacionado a interações e mensagens.
 
 
 ## Entidade: Contem (Diálogo-Mensagem)
-Descrição: Relaciona diálogos com suas mensagens.
-Observações: Associação N:N.
+**Descrição**: Relaciona diálogos com suas mensagens.
+
+**Observações**: Associação N:N.
 
 | Campo             | Tipo    | Tamanho | Descrição                       | Restrições |
 | ----------------- | ------- | ------- | ------------------------------- | ---------- |
@@ -190,8 +203,9 @@ Observações: Associação N:N.
 
 
 ## Entidade: InterageCom
-Descrição: Relaciona personagens com diálogos.
-Observações: Associação de interações.
+**Descrição**: Relaciona personagens com diálogos.
+
+**Observações**: Associação de interações.
 
 | Campo        | Tipo    | Tamanho | Descrição                         | Restrições |
 | ------------ | ------- | ------- | --------------------------------- | ---------- |
@@ -201,8 +215,9 @@ Observações: Associação de interações.
 
 
 ## Entidade: GatilhoDialogo
-Descrição: Define condições para disparar diálogos.
-Observações: Associado a Dialogos.
+**Descrição**: Define condições para disparar diálogos.
+
+**Observações**:Associado a Dialogos.
 
 | Campo     | Tipo    | Tamanho | Descrição                      | Restrições    |
 | --------- | ------- | ------- | ------------------------------ | ------------- |
@@ -212,8 +227,9 @@ Observações: Associado a Dialogos.
 
 
 ## Entidade: ÉAtivadoPor
-Descrição: Relaciona diálogos com os gatilhos que os ativam.
-Observações: Associação de ativação.
+**Descrição**: Relaciona diálogos com os gatilhos que os ativam.
+
+**Observações**:Associação de ativação.
 
 | Campo     | Tipo    | Tamanho | Descrição                      | Restrições |
 | --------- | ------- | ------- | ------------------------------ | ---------- |
