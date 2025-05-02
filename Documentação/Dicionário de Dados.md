@@ -46,14 +46,12 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 ## Entidade: ClasseItens
 **Descrição**: Define categorias e atributos base para itens do jogo.
 
-**Observações**: Há especializações para armas de fogo e armas brancas.
+**Observações**: É a generalização Total e Conjuntiva de Arma_de_Fogo e ArmaBranca. Por isso, na prática, ela não existe em nível mais baixo.
 
 | Campo         | Tipo    | Tamanho | Descrição                             | Restrições    |
 | ------------- | ------- | ------- | ------------------------------------- | ------------- |
 | IDClasseItens | integer |         | Identificador único da classe de item | PK / Identity |
 | Nome          | varchar |         | Nome do item                          | Not Null      |
-| Munição       | integer |         | Quantidade de munição (arma de fogo)  | Opcional      |
-| DanoCorte     | integer |         | Dano de corte (arma branca)           | Opcional      |
 
 
 
@@ -79,7 +77,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | ------------- | ------- | ------- | ---------------------------------- | ---------- |
 | IDClasseItens | integer |         | Chave estrangeira para ClasseItens | PK / FK    |
 | Nome          | varchar |         | Nome da arma branca                | Not Null   |
-| DanoCorte     | integer |         | Dano de corte                      | Not Null   |
+| DanoCorte     | integer |         | Dano de corte em porcentagem       | Not Null   |
 
 
 
