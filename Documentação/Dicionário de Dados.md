@@ -1,5 +1,16 @@
 # DICIONÁRIO DE DADOS
 
+## Visão geral das tabelas
+Clique em uma tabela e seja diretamente direcionado para ela.
+
+| [Contas](#entidade-contas) | [Personagens](#entidade-personagens) | [Gatilhos_dialogo](#entidade-gatilhos_dialogo) |
+|:----------------------------:|:------------------------------------:|:---------------------------------------------:|
+| **[habilidades](#entidade-habilidades)** | **[Habilidades_Personagem](#entidade-associativa-habilidades_personagem)** | **[Classes_itens](#entidade-classes_itens)**|
+|**[Instancias Itens](#tabela-instancias_itens)** |**[Inventario](#entidade-inventario)** | **[Locais](#entidade-locais)** |
+| **[Dialogos_personagem](#tabela-dialogos_personagem)** | **[Posicoes](#entidade-posicoes)** | **[Zumbis](#entidade-zumbis)** |
+|**[Missoes](#entidade-missoes)** | **[MissoesPersonagem](#entidade-associativa-missoes_personagem)** | **[Dialogos](#entidade-dialogos)** |
+|**[MensagensDialogo](#entidade-mensagens_dialogo)** | **[Opcoes_resposta](#tabela-opcoes_resposta)** |
+
 
 ## Entidade: Contas
 **Descrição**: Armazena as informações das contas de usuários.
@@ -19,7 +30,7 @@
 | motivo_banimento | text       |         | Motivo do banimento (se houver)        |                              |
 
 
-## Tabela: Personagens
+## Entidade: Personagens
 Descrição: Armazena os dados dos personagens dos jogadores.
 Observações: Possui uma chave estrangeira da tabela contas.
 
@@ -49,7 +60,7 @@ Observações: Possui uma chave estrangeira da tabela contas.
 | contador_mortes_infligidas | integer    |         | Número de mortes causadas              | Default: 0                   |
 
 
-## Tabela: gatilhos_dialogo
+## Entidade: Gatilhos_dialogo
 Descrição: Define condições para disparar diálogos.
 Observações: Gatilhos podem ser por local, item, etc.
 
@@ -60,61 +71,12 @@ Observações: Gatilhos podem ser por local, item, etc.
 | tipo_gatilho     | enum       |         | Tipo (local, evento, item, etc.)      | Not Null                     |
 | valor_gatilho    | varchar    | 100     | Valor específico do gatilho            | Not Null                     |
 
-========================================
 LEGENDA:
-- PK: Primary Key (Chave Primária)
-- FK: Foreign Key (Chave Estrangeira)
 - Identity: Campo autoincrementável
 - Enum: Valores pré-definidos (ex: enum('combate', 'sobrevivencia'))
 
-## Tabela: contas
-Descrição: Armazena as informações das contas de usuários.
-Observações: Essa tabela é a base para autenticação e permissões.
 
-| Campo            | Tipo       | Tamanho | Descrição                              | Restrições                   |
-|------------------|------------|---------|----------------------------------------|------------------------------|
-| id_conta         | integer    |         | Identificador único da conta           | PK / Identity                |
-| nome_usuario     | varchar    | 50      | Nome de usuário                        | Unique / Not Null            |
-| senha_hash       | varchar    | 255     | Hash da senha                          | Not Null                     |
-| email            | varchar    | 100     | E-mail do usuário                      | Unique / Not Null            |
-| data_criacao     | timestamp  |         | Data de criação da conta               | Not Null                     |
-| ultimo_login     | timestamp  |         | Último login                           |                              |
-| eh_admin         | boolean    |         | Indica se é administrador              | Default: False               |
-| esta_banido      | boolean    |         | Indica se está banido                  | Default: False               |
-| motivo_banimento | text       |         | Motivo do banimento (se houver)        |                              |
-
-
-## Tabela: personagens
-Descrição: Armazena os dados dos personagens dos jogadores.
-Observações: Possui uma chave estrangeira da tabela contas.
-
-| Campo                      | Tipo       | Tamanho | Descrição                              | Restrições                   |
-|----------------------------|------------|---------|----------------------------------------|------------------------------|
-| id_personagem              | integer    |         | Identificador único do personagem      | PK / Identity                |
-| id_conta                   | integer    |         | Chave estrangeira da tabela contas     | FK / Not Null                |
-| nome                       | varchar    | 50      | Nome do personagem                     | Not Null                     |
-| nivel                      | integer    |         | Nível do personagem                    | Default: 1                   |
-| experiencia                | integer    |         | Pontos de experiência                  | Default: 0                   |
-| vida                       | integer    |         | Vida atual                             | Not Null                     |
-| vida_maxima                | integer    |         | Vida máxima                            | Not Null                     |
-| energia                    | integer    |         | Energia atual                          | Not Null                     |
-| energia_maxima             | integer    |         | Energia máxima                         | Not Null                     |
-| fome                       | integer    |         | Nível de fome                          | Default: 100                 |
-| sede                       | integer    |         | Nível de sede                          | Default: 100                 |
-| nivel_infeccao             | integer    |         | Nível de infecção                      | Default: 0                   |
-| forca                      | integer    |         | Força do personagem                    | Default: 5                   |
-| agilidade                  | integer    |         | Agilidade do personagem                | Default: 5                   |
-| resistencia                | integer    |         | Resistência do personagem              | Default: 5                   |
-| inteligencia               | integer    |         | Inteligência do personagem             | Default: 5                   |
-| carisma                    | integer    |         | Carisma do personagem                  | Default: 5                   |
-| data_criacao               | timestamp  |         | Data de criação do personagem          | Not Null                     |
-| ultimo_jogado              | timestamp  |         | Última vez que foi jogado              |                              |
-| esta_vivo                  | boolean    |         | Indica se está vivo                    | Default: True                |
-| contador_mortes            | integer    |         | Número de mortes                       | Default: 0                   |
-| contador_mortes_infligidas | integer    |         | Número de mortes causadas              | Default: 0                   |
-
-
-## Tabela: habilidades
+## Entidade: habilidades
 Descrição: Armazena as habilidades disponíveis no jogo.
 Observações: Define tipos e requisitos para uso.
 
@@ -128,7 +90,7 @@ Observações: Define tipos e requisitos para uso.
 | nivel_requerido  | integer    |         | Nível mínimo para desbloquear          | Default: 1                   |
 
 
-## Tabela: habilidades_personagem
+## Entidade Associativa: habilidades_personagem
 Descrição: Relaciona personagens às habilidades que possuem.
 Observações: Chaves estrangeiras das tabelas personagens e habilidades.
 
@@ -139,7 +101,7 @@ Observações: Chaves estrangeiras das tabelas personagens e habilidades.
 | nivel_habilidade | integer    |         | Nível de proficiência na habilidade    | Default: 1                   |
 
 
-## Tabela: classes_itens
+## Entidade: classes_itens
 Descrição: Define categorias e atributos base para itens do jogo.
 Observações: Enumera tipos como "arma", "comida", etc.
 
@@ -168,7 +130,7 @@ Observações: Relaciona-se com classes_itens e locais.
 | id_local_spawn      | integer    |         | Local onde o item aparece              | FK                           |
 
 
-## Tabela: inventario
+## Entidade: inventario
 Descrição: Gerencia itens pertencentes a personagens.
 Observações: Chaves estrangeiras de personagens e instancias_itens.
 
@@ -180,7 +142,7 @@ Observações: Chaves estrangeiras de personagens e instancias_itens.
 | equipado            | boolean    |         | Indica se está equipado                | Default: False               |
 
 
-## Tabela: locais
+## Entidade: locais
 Descrição: Descreve áreas do mapa do jogo.
 Observações: Tipos incluem "cidade", "floresta", etc.
 
@@ -194,7 +156,7 @@ Observações: Tipos incluem "cidade", "floresta", etc.
 | recursos         | integer    |         | Nível de recursos disponíveis (0-100)  | Default: 50                  |
 
 
-## Tabela: posicoes
+## Entidade: posicoes
 Descrição: Armazena a localização atual dos personagens no mapa.
 Observações: Relaciona-se com personagens e locais.
 
@@ -206,7 +168,7 @@ Observações: Relaciona-se com personagens e locais.
 | coordenada_y     | integer    |         | Posição no eixo Y                      | Default: 0                   |
 
 
-## Tabela: zumbis
+## Entidade: zumbis
 Descrição: Registra zumbis no jogo e seus atributos.
 Observações: Tipos incluem "comum", "tanque", etc.
 
@@ -222,7 +184,7 @@ Observações: Tipos incluem "comum", "tanque", etc.
 | coordenada_y     | integer    |         | Posição no eixo Y                      | Default: 0                   |
 
 
-## Tabela: missoes
+## Entidade: missoes
 Descrição: Define missões disponíveis no jogo.
 Observações: Possui recompensas e requisitos.
 
@@ -236,7 +198,7 @@ Observações: Possui recompensas e requisitos.
 | nivel_requerido        | integer    |         | Nível mínimo para aceitar              | Default: 1                   |
 
 
-## Tabela: missoes_personagem
+## Entidade Associativa: missoes_personagem
 Descrição: Rastreia o progresso de missões por personagem.
 Observações: Estados incluem "em_andamento", "completa", etc.
 
@@ -248,7 +210,7 @@ Observações: Estados incluem "em_andamento", "completa", etc.
 | progresso        | integer    |         | Progresso atual (0-100)                | Default: 0                   |
 
 
-## Tabela: dialogos
+## Entidade: dialogos
 Descrição: Armazena diálogos do jogo (NPCs, tutoriais, etc.).
 Observações: Categorias incluem "história", "evento", etc.
 
@@ -260,7 +222,7 @@ Observações: Categorias incluem "história", "evento", etc.
 | prioridade       | integer    |         | Ordem de exibição                      | Default: 1                   |
 
 
-## Tabela: mensagens_dialogo
+## Entidade: mensagens_dialogo
 Descrição: Mensagens individuais dentro de um diálogo.
 Observações: Pode requerer ações do jogador.
 
