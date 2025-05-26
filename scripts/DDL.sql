@@ -66,7 +66,8 @@ CREATE TABLE InstanciaItens (
 CREATE TABLE Locais (
     IDLocal SERIAL PRIMARY KEY,
     Nome VARCHAR(255) NOT NULL,
-    Coordenadas VARCHAR(255) NOT NULL,
+    Coordenada_X INTEGER NOT NULL,
+    Coordenada_Y INTEGER NOT NULL,
     IDPersonagem INTEGER REFERENCES Personagem(IDPersonagem) ON DELETE SET NULL
 );
 
