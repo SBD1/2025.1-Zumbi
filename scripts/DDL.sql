@@ -30,6 +30,8 @@ CREATE TABLE Personagem (
     VidaAtual INTEGER NOT NULL,
     IDConta INTEGER REFERENCES Conta(IDConta) ON DELETE CASCADE,
     IDInventario INTEGER REFERENCES Inventario(IDInventario) ON DELETE SET NULL
+    Coordenada_X INTEGER
+    Coordenada_Y INTEGER 
 );
 
 ----------------------------
@@ -68,7 +70,6 @@ CREATE TABLE Locais (
     Nome VARCHAR(255) NOT NULL,
     Coordenada_X INTEGER NOT NULL,
     Coordenada_Y INTEGER NOT NULL,
-    IDPersonagem INTEGER REFERENCES Personagem(IDPersonagem) ON DELETE SET NULL
 );
 
 ----------------------------

@@ -54,6 +54,63 @@ app.get('/personagens/:idconta', async (req, res) => {
     }
 });
 
+app.get('/personagens/local/:idpersonagem', async (req, res) => {
+    const { idpersonagem } = req.params;
+    try {
+        const resultado = await pool.query(
+            'SELECT p.nome, l.nome AS local_nome FROM personagem p JOIN locais l ON l.coordenada_x = p.coordenada_x AND l.coordenada_y = p.coordenada_y Where p.idpersonagem = $1',
+            [idpersonagem]
+        )
+        res.json(resultado.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro no servidor');
+    }
+})
+
+app.get('/personagem/locaispossiveis/:idpersonagem', async (req, res) => {
+    const { idpersonagem } = req.params;
+
+    try {
+        const resultado = await pool.query(
+            `SELECT 'Norte' AS direcao, L.nome 
+             FROM personagem P 
+             JOIN locais L ON P.coordenada_x = L.coordenada_x 
+                          AND P.coordenada_y + 1 = L.coordenada_y
+             WHERE P.idpersonagem = $1
+             
+             UNION ALL
+             
+             SELECT 'Sul' AS direcao, L.nome 
+             FROM personagem P 
+             JOIN locais L ON P.coordenada_x = L.coordenada_x 
+                          AND P.coordenada_y - 1 = L.coordenada_y
+             WHERE P.idpersonagem = $1
+             
+             UNION ALL
+             
+             SELECT 'Leste' AS direcao, L.nome 
+             FROM personagem P 
+             JOIN locais L ON P.coordenada_x + 1 = L.coordenada_x 
+                          AND P.coordenada_y = L.coordenada_y
+             WHERE P.idpersonagem = $1
+             
+             UNION ALL
+             
+             SELECT 'Oeste' AS direcao, L.nome 
+             FROM personagem P 
+             JOIN locais L ON P.coordenada_x - 1 = L.coordenada_x 
+                          AND P.coordenada_y = L.coordenada_y
+             WHERE P.idpersonagem = $1`,
+            [idpersonagem]
+        );
+
+        res.status(200).json(resultado.rows);
+    } catch (err) {
+        console.error('Erro ao buscar locais possíveis:', err);
+        res.status(500).json({ erro: 'Erro interno do servidor' });
+    }
+});
 
 
 app.listen(3000, () => {
