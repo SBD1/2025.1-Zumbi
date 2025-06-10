@@ -17,20 +17,33 @@ personagem_selecionado = None
 
 # Função de login
 def login():
-    nome = input("Email: ")
-    senha = input("Senha: ")
+    print("Você possui conta? Y/N \n"); 
+    opcao = input(); 
+    if opcao == 'Y':
+        nome = input("Email: ")
+        senha = input("Senha: ")
 
-    cursor.execute(
+        cursor.execute(
         'SELECT * FROM conta WHERE email = %s AND senha = %s',
         (nome, senha))
-    jogador = cursor.fetchone()
+        jogador = cursor.fetchone()
 
-    if jogador:
-        print(f"\nBem-vindo, {nome}!\n")
-        menu_jogo(jogador)
-    else:
-        print("Login inválido.")
+        if jogador:
+            print(f"\nBem-vindo, {nome}!\n")
+            menu_jogo(jogador)
+        else:
+            print("Login inválido.")
+            
+    elif opcao == 'N':
+        print("Vamos criar sua conta"); 
+        email = input("Email:"); 
+        senha = input("Senha:"); 
 
+ 
+
+
+
+   
 
 # 🎭 Selecionar Personagem
 def SelecionarPersonagem(jogador):
@@ -214,7 +227,7 @@ def menu_jogo(jogador):
             SelecionarPersonagem(jogador)
         elif opcao == "1" and personagem_selecionado:
             Mapa()
-        elif opcao == "3":
+        elif opcao == "2":
             print("Saindo...")
             break
         else:
