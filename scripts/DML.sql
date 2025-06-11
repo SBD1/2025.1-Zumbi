@@ -42,9 +42,6 @@ INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, IDInventario) VALU
 (6, 2, 3), -- Dr. Helena possui um kit de primeiros socorros
 (7, 3, 4), -- Marco possui uma pistola 9mm
 (8, 4, 4), -- Marco possui munição 9mm
-(6, 2, 5), -- Laura possui um kit de primeiros socorros
-(7, 3, 6), -- Carlos possui uma pistola 9mm
-(8, 4, 6), -- Carlos possui munição 9mm
 (9, 1, 6); -- Carlos possui uma faca enferrujada
 
 -- Inserindo dados na tabela Local
@@ -112,7 +109,8 @@ INSERT INTO Zumbi_Brutamonte (IDZumbiBrutamonte, Resistencia_a_bala, DanoBase) V
 -- Inserindo dados na tabela Chaves
 INSERT INTO Chaves (IDChave, Nome_Chave) VALUES
 (1, 'Chave do Hospital'),
-(2, 'Chave da Delegacia');
+(2, 'Chave da Delegacia'),
+(3, 'Chave da Base Militar');
 
 -- Inserindo dados na tabela ArmaDeFogo
 INSERT INTO ArmaDeFogo (IDArmaDeFogo, Munição, Dano_maximo) VALUES
@@ -153,4 +151,4 @@ INSERT INTO Dialogos_Missao (IDDialogo, IDMissao) VALUES
 INSERT INTO Local_Chaves (IDLocal, IDChave) VALUES
 (2, 1), -- Hospital Abandonado precisa da Chave do Hospital
 (3, 2), -- Delegacia precisa da Chave da Delegacia
-(4, 3). -- Base militar precisa da Chave da Base MIlitar
+(4, 3); -- Base militar precisa da Chave da Base MIlitar
