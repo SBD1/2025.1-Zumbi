@@ -25,7 +25,7 @@ CREATE TABLE TipoZumbi (
 
 -- Tabela Personagem
 CREATE TABLE Personagem (
-    IDPersonagem INT PRIMARY KEY,
+    IDPersonagem SERIAL INT PRIMARY KEY,
     Nome VARCHAR(255),
     VidaAtual INT,
     IDConta INT,
