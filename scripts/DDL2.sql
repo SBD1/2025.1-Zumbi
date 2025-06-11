@@ -6,13 +6,33 @@ CREATE TABLE Conta (
     Status INT 
 );
 
+-- Tabela Local
+CREATE TABLE Local (
+    IDLocal INT PRIMARY KEY,
+    Nome VARCHAR(255),
+    Precisa_Chave BOOLEAN, -- ou INT se precisar de um ID de chave específico
+    Norte INT, FOREIGN KEY(Norte) REFERENCES Local(IDLocal), 
+    Sul INT,  FOREIGN KEY(Sul) REFERENCES Local(IDLocal), 
+    Leste INT,  FOREIGN KEY(Leste) REFERENCES Local(IDLocal), 
+    Oeste INT,  FOREIGN KEY(Oeste) REFERENCES Local(IDLocal)
+);
+
+-- Tabela TipoZumbi (Herança)
+CREATE TABLE TipoZumbi (
+    IDTipoZumbi INT PRIMARY KEY,
+    -- Atributos comuns
+    DanoBase INT
+);
+
 -- Tabela Personagem
 CREATE TABLE Personagem (
     IDPersonagem INT PRIMARY KEY,
     Nome VARCHAR(255),
     VidaAtual INT,
     IDConta INT,
-    FOREIGN KEY (IDConta) REFERENCES Conta(IDConta)
+    IDLocal INT, 
+    FOREIGN KEY (IDConta) REFERENCES Conta(IDConta), 
+    FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal)
 );
 
 -- Tabela Inventario
@@ -29,26 +49,6 @@ CREATE TABLE Classeltens (
     Nome VARCHAR(255)
 );
 
--- Tabela Instancias_Itens
-CREATE TABLE Instancias_Itens (
-    IDInstanciaItem INT PRIMARY KEY,
-    IDClasseltens INT,
-    FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens),
-    IDInventario INT,
-    FOREIGN KEY (IDInventario) REFERENCES Inventario(IDInventario)
-);
-
--- Tabela Local
-CREATE TABLE Local (
-    IDLocal INT PRIMARY KEY,
-    Nome VARCHAR(255),
-    Precisa_Chave BOOLEAN, -- ou INT se precisar de um ID de chave específico
-    Norte INT, FOREIGN KEY(Norte) REFERENCES Local(IDLocal), 
-    Sul INT,  FOREIGN KEY(Sul) REFERENCES Local(IDLocal), 
-    Leste INT,  FOREIGN KEY(Leste) REFERENCES Local(IDLocal), 
-    Oeste INT,  FOREIGN KEY(Oeste) REFERENCES Local(IDLocal)
-);
-
 -- Tabela Missao
 CREATE TABLE Missao (
     IDMissao INT PRIMARY KEY,
@@ -62,53 +62,6 @@ CREATE TABLE Missao (
 CREATE TABLE Dialogos (
     IDDialogo INT PRIMARY KEY,
     Titulo VARCHAR(255)
-);
-
--- Tabela MensagensDialogos
-CREATE TABLE MensagensDialogos (
-    IDMensagemDialogo INT PRIMARY KEY,
-    Texto TEXT,
-    Ordem_de_Exibicao INT,
-    IDDialogo INT,
-    FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
-);
-
--- Tabela Instancia_Zumbi
-CREATE TABLE Instancia_Zumbi (
-    IDInstanciaZumbi INT PRIMARY KEY,
-    VidaAtual INT,
-    IDLocal INT,
-    FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal)
-);
-
--- Tabela TipoZumbi (Herança)
-CREATE TABLE TipoZumbi (
-    IDTipoZumbi INT PRIMARY KEY,
-    -- Atributos comuns
-    DanoBase INT
-);
-
--- Tabela Zumbi_Comum
-CREATE TABLE Zumbi_Comum (
-    IDZumbiComum INT PRIMARY KEY,
-    FOREIGN KEY (IDZumbiComum) REFERENCES TipoZumbi(IDTipoZumbi),
-    DanoBase INT
-);
-
--- Tabela Zumbi_Infeccioso
-CREATE TABLE Zumbi_Infeccioso (
-    IDZumbiInfeccioso INT PRIMARY KEY,
-    FOREIGN KEY (IDZumbiInfeccioso) REFERENCES TipoZumbi(IDTipoZumbi),
-    Taxa_Infeccao INT,
-    DanoBase INT
-);
-
--- Tabela Zumbi_Brutamonte
-CREATE TABLE Zumbi_Brutamonte (
-    IDZumbiBrutamonte INT PRIMARY KEY,
-    FOREIGN KEY (IDZumbiBrutamonte) REFERENCES TipoZumbi(IDTipoZumbi),
-    Resistencia_a_bala BOOLEAN,
-    DanoBase INT
 );
 
 -- Tabela Chaves
@@ -134,6 +87,57 @@ CREATE TABLE ArmaBranca (
 CREATE TABLE Medicamentos (
     IDMedicamentos INT PRIMARY KEY,
     Ganho_vida INT
+);
+
+-- Tabela MensagensDialogos
+CREATE TABLE MensagensDialogos (
+    IDMensagemDialogo INT PRIMARY KEY,
+    Texto TEXT,
+    Ordem_de_Exibicao INT,
+    IDDialogo INT,
+    FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
+);
+
+-- Tabela Instancias_Itens
+CREATE TABLE Instancias_Itens (
+    IDInstanciaItem INT PRIMARY KEY,
+    IDClasseltens INT,
+    IDInventario INT,
+    FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens),
+    FOREIGN KEY (IDInventario) REFERENCES Inventario(IDInventario)
+);
+
+-- Tabela Instancia_Zumbi
+CREATE TABLE Instancia_Zumbi (
+    IDInstanciaZumbi INT PRIMARY KEY,
+    VidaAtual INT,
+    IDLocal INT,
+    IDTipoZumbi INT, 
+    FOREIGN KEY (IDTipoZumbi) REFERENCES TipoZumbi(IDTipoZumbi), 
+    FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal)
+);
+
+-- Tabela Zumbi_Comum
+CREATE TABLE Zumbi_Comum (
+    IDZumbiComum INT PRIMARY KEY,
+    DanoBase INT,
+    FOREIGN KEY (IDZumbiComum) REFERENCES TipoZumbi(IDTipoZumbi)
+);
+
+-- Tabela Zumbi_Infeccioso
+CREATE TABLE Zumbi_Infeccioso (
+    IDZumbiInfeccioso INT PRIMARY KEY,
+    Taxa_Infeccao INT,
+    DanoBase INT,
+     FOREIGN KEY (IDZumbiInfeccioso) REFERENCES TipoZumbi(IDTipoZumbi)
+);
+
+-- Tabela Zumbi_Brutamonte
+CREATE TABLE Zumbi_Brutamonte (
+    IDZumbiBrutamonte INT PRIMARY KEY,
+    Resistencia_a_bala BOOLEAN,
+    DanoBase INT,
+    FOREIGN KEY (IDZumbiBrutamonte) REFERENCES TipoZumbi(IDTipoZumbi)
 );
 
 -- Tabelas de relacionamento N:N
@@ -196,38 +200,4 @@ CREATE TABLE Local_Missao (
     FOREIGN KEY (IDMissao) REFERENCES Missao(IDMissao)
 );
 
--- Tabela de relacionamento entre ArmaDeFogo e Chaves
-CREATE TABLE ArmaDeFogo_Chaves (
-    IDArmaDeFogo INT,
-    IDChave INT,
-    PRIMARY KEY (IDArmaDeFogo, IDChave),
-    FOREIGN KEY (IDArmaDeFogo) REFERENCES ArmaDeFogo(IDArmaDeFogo),
-    FOREIGN KEY (IDChave) REFERENCES Chaves(IDChave)
-);
 
--- Tabela de relacionamento entre ArmaBranca e Chaves
-CREATE TABLE ArmaBranca_Chaves (
-    IDArmaBranca INT,
-    IDChave INT,
-    PRIMARY KEY (IDArmaBranca, IDChave),
-    FOREIGN KEY (IDArmaBranca) REFERENCES ArmaBranca(IDArmaBranca),
-    FOREIGN KEY (IDChave) REFERENCES Chaves(IDChave)
-);
-
--- Tabela de relacionamento entre Medicamentos e Chaves
-CREATE TABLE Medicamentos_Chaves (
-    IDMedicamentos INT,
-    IDChave INT,
-    PRIMARY KEY (IDMedicamentos, IDChave),
-    FOREIGN KEY (IDMedicamentos) REFERENCES Medicamentos(IDMedicamentos),
-    FOREIGN KEY (IDChave) REFERENCES Chaves(IDChave)
-);
-
--- Tabela de relacionamento entre TipoZumbi e Instancia_Zumbi
-CREATE TABLE InstanciaZumbi_TipoZumbi (
-    IDInstanciaZumbi INT,
-    IDTipoZumbi INT,
-    PRIMARY KEY (IDInstanciaZumbi, IDTipoZumbi),
-    FOREIGN KEY (IDInstanciaZumbi) REFERENCES Instancia_Zumbi(IDInstanciaZumbi),
-    FOREIGN KEY (IDTipoZumbi) REFERENCES TipoZumbi(IDTipoZumbi)
-);
