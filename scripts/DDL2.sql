@@ -1,11 +1,10 @@
 -- Tabela Conta
 CREATE TABLE Conta (
-    IDConta INT PRIMARY KEY,
+    IDConta SERIAL PRIMARY KEY,
     Email VARCHAR(255),
     Senha VARCHAR(255),
     Status INT 
 );
-
 -- Tabela Local
 CREATE TABLE Local (
     IDLocal INT PRIMARY KEY,
