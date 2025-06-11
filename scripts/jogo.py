@@ -3,7 +3,7 @@ import random
 
 # Conexão com o banco
 conn = psycopg2.connect(
-    dbname="ZUmbi",
+    dbname="Zumbi2",
     user="postgres",
     password="",
     host="localhost",
@@ -17,47 +17,59 @@ personagem_selecionado = None
 
 # Função de login
 def login():
-    print("Você possui conta? Y/N \n"); 
-    opcao = input(); 
+    print("Você possui conta? Y/N \n")
+    opcao = input()
     if opcao == 'Y':
-        nome = input("Email: ")
+        email = input("Email: ")
         senha = input("Senha: ")
 
         cursor.execute(
-        'SELECT * FROM conta WHERE email = %s AND senha = %s',
-        (nome, senha))
+            'SELECT * FROM Conta WHERE Email = %s AND Senha = %s',
+            (email, senha))
         jogador = cursor.fetchone()
 
         if jogador:
-            print(f"\nBem-vindo, {nome}!\n")
+            print(f"\nBem-vindo, {email}!\n")
             menu_jogo(jogador)
         else:
             print("Login inválido.")
-            
+
     elif opcao == 'N':
-        print("Vamos criar sua conta"); 
-        email = input("Email:"); 
-        senha = input("Senha:"); 
+        print("Vamos criar sua conta")
+        email = input("Email:")
+        senha = input("Senha:")
 
- 
+        try:
+            cursor.execute(
+                'INSERT INTO Conta (Email, Senha, Status) VALUES (%s, %s, %s)',
+                (email, senha, 1))  # Status 1 para conta ativa
+            conn.commit()
+            print("Conta criada com sucesso!")
+            # Loga automaticamente após a criação da conta
+            cursor.execute(
+                'SELECT * FROM Conta WHERE Email = %s AND Senha = %s',
+                (email, senha))
+            jogador = cursor.fetchone()
+            menu_jogo(jogador)
 
+        except psycopg2.Error as e:
+            conn.rollback()
+            print(f"Erro ao criar conta: {e}")
 
-
-   
 
 # 🎭 Selecionar Personagem
 def SelecionarPersonagem(jogador):
     global personagem_selecionado
 
     cursor.execute(
-        'SELECT idpersonagem, nome FROM personagem WHERE idconta = %s',
+        'SELECT IDPersonagem, Nome FROM Personagem WHERE IDConta = %s',
         (jogador[0],))
-    
+
     personagens = cursor.fetchall()
 
     if not personagens:
         print("Nenhum personagem encontrado. Crie um personagem primeiro.")
-        personagem_selecionado = None
+        CriarPersonagem(jogador)  # Chama a função para criar personagem
         return
 
     print("\n👥 Seus Personagens:")
@@ -77,6 +89,23 @@ def SelecionarPersonagem(jogador):
             print("Digite um número válido.")
 
 
+# Função para criar um novo personagem
+def CriarPersonagem(jogador):
+    nome_personagem = input("Digite o nome do seu novo personagem: ")
+
+    try:
+        # Local padrão para o personagem (IDLocal = 1)
+        cursor.execute(
+            'INSERT INTO Personagem (Nome, VidaAtual, IDConta, IDLocal) VALUES (%s, %s, %s, %s)',
+            (nome_personagem, 100, jogador[0], 1))  # Vida inicial = 100
+        conn.commit()
+        print(f"Personagem '{nome_personagem}' criado com sucesso!")
+        SelecionarPersonagem(jogador)  # Volta para a seleção de personagem
+    except psycopg2.Error as e:
+        conn.rollback()
+        print(f"Erro ao criar personagem: {e}")
+
+
 # Função de mapa
 def Mapa():
     global personagem_selecionado
@@ -89,11 +118,11 @@ def Mapa():
         # Consulta o local atual do personagem
         cursor.execute(
             """
-            SELECT p.nome, l.nome AS local_nome 
-            FROM personagem p 
-            JOIN locais l 
-            ON l.coordenada_x = p.coordenada_x AND l.coordenada_y = p.coordenada_y 
-            WHERE p.idpersonagem = %s
+            SELECT p.Nome, l.Nome AS local_nome 
+            FROM Personagem p 
+            JOIN Local l 
+            ON l.IDLocal = p.IDLocal 
+            WHERE p.IDPersonagem = %s
             """,
             (personagem_selecionado,)
         )
@@ -103,7 +132,7 @@ def Mapa():
             nome_personagem, local_nome = resultado
             print(f"\nLocal Atual: {local_nome}")
             print(f"Personagem: {nome_personagem}")
-        
+
         else:
             print("Personagem não encontrado ou sem local definido.")
 
@@ -126,88 +155,94 @@ def Mapa():
 # Função para Movimentar
 def Movimentar():
     global personagem_selecionado
-    
+
     if personagem_selecionado is None:
         print("Nenhum personagem selecionado. Selecione um personagem primeiro.")
         return
 
-    # Consulta locais adjacentes
+    # Consulta o IDLocal atual do personagem
+    cursor.execute(
+        "SELECT IDLocal FROM Personagem WHERE IDPersonagem = %s",
+        (personagem_selecionado,)
+    )
+    local_atual = cursor.fetchone()
+
+    if not local_atual:
+        print("Erro: Local atual do personagem não encontrado.")
+        return
+
+    local_atual_id = local_atual[0]
+
+    # Consulta locais adjacentes usando a estrutura Norte, Sul, Leste, Oeste
     cursor.execute(
         """
-        -- Local ao NORTE (y + 1)
-        SELECT 'Norte' AS direcao, L.nome, L.coordenada_x, L.coordenada_y
-        FROM personagem P 
-        JOIN locais L ON P.coordenada_x = L.coordenada_x 
-                     AND P.coordenada_y + 1 = L.coordenada_y
-        WHERE P.idpersonagem = %s
-
-        UNION ALL
-
-        -- Local ao SUL (y - 1)
-        SELECT 'Sul' AS direcao, L.nome, L.coordenada_x, L.coordenada_y
-        FROM personagem P 
-        JOIN locais L ON P.coordenada_x = L.coordenada_x 
-                     AND P.coordenada_y - 1 = L.coordenada_y
-        WHERE P.idpersonagem = %s
-
-        UNION ALL
-
-        -- Local ao LESTE (x + 1)
-        SELECT 'Leste' AS direcao, L.nome, L.coordenada_x, L.coordenada_y
-        FROM personagem P 
-        JOIN locais L ON P.coordenada_x + 1 = L.coordenada_x 
-                     AND P.coordenada_y = L.coordenada_y
-        WHERE P.idpersonagem = %s
-
-        UNION ALL
-
-        -- Local ao OESTE (x - 1)
-        SELECT 'Oeste' AS direcao, L.nome, L.coordenada_x, L.coordenada_y
-        FROM personagem P 
-        JOIN locais L ON P.coordenada_x - 1 = L.coordenada_x 
-                     AND P.coordenada_y = L.coordenada_y
-        WHERE P.idpersonagem = %s
+        SELECT 
+            A.Nome AS Atual,
+            N.Nome AS Norte,
+            S.Nome AS Sul,
+            O.Nome AS Oeste,
+            L.Nome AS Leste,
+            N.IDLocal AS NorteID,
+            S.IDLocal AS SulID,
+            O.IDLocal AS OesteID,
+            L.IDLocal AS LesteID
+        FROM Local A
+        LEFT JOIN Local N ON N.IDLocal = A.Norte
+        LEFT JOIN Local S ON S.IDLocal = A.Sul
+        LEFT JOIN Local O ON O.IDLocal = A.Oeste
+        LEFT JOIN Local L ON L.IDLocal = A.Leste
+        WHERE A.IDLocal = %s
         """,
-        (personagem_selecionado, personagem_selecionado, 
-         personagem_selecionado, personagem_selecionado)
+        (local_atual_id,)
     )
-    
-    locais_adjacentes = cursor.fetchall()
-    
+
+    locais_adjacentes = cursor.fetchone()
+
     if not locais_adjacentes:
         print("\nNenhum local adjacente disponível.")
         return
 
     print("\nLocais Adjacentes:")
-    for i, (direcao, nome_local, x, y) in enumerate(locais_adjacentes, 1):
-        print(f"{i}. {direcao}: {nome_local}")
+    atual, norte, sul, oeste, leste, norte_id, sul_id, oeste_id, leste_id = locais_adjacentes
+
+    # Imprime os locais adjacentes
+    print(f"Norte: {norte if norte else 'N/A'}")
+    print(f"Sul: {sul if sul else 'N/A'}")
+    print(f"Leste: {leste if leste else 'N/A'}")
+    print(f"Oeste: {oeste if oeste else 'N/A'}")
 
     # Menu de movimentação
     while True:
         try:
-            escolha = input("\nEscolha o número do local para mover ou '0' para cancelar: ")
-            
+            escolha = input("\nEscolha a direção para mover (Norte, Sul, Leste, Oeste) ou '0' para cancelar: ").capitalize()
+
+            novo_id_local = None
             if escolha == '0':
                 print("Movimentação cancelada.")
                 return
-                
-            escolha = int(escolha)
-            if 1 <= escolha <= len(locais_adjacentes):
-                direcao, nome_local, novo_x, novo_y = locais_adjacentes[escolha-1]
-                
+            elif escolha == 'Norte' and norte:
+                novo_id_local = norte_id
+            elif escolha == 'Sul' and sul:
+                novo_id_local = sul_id
+            elif escolha == 'Leste' and leste:
+                novo_id_local = leste_id
+            elif escolha == 'Oeste' and oeste:
+                novo_id_local = oeste_id
+            else:
+                print("Direção inválida. Tente novamente.")
+
+            if novo_id_local:
                 # Atualiza posição do personagem
                 cursor.execute(
-                    "UPDATE personagem SET coordenada_x = %s, coordenada_y = %s WHERE idpersonagem = %s",
-                    (novo_x, novo_y, personagem_selecionado))
+                    "UPDATE Personagem SET IDLocal = %s WHERE IDPersonagem = %s",
+                    (novo_id_local, personagem_selecionado))
                 conn.commit()
-                
-                print(f"\nMovido com sucesso para {direcao}: {nome_local}")
+
+                print(f"\nMovido com sucesso para {escolha}: {norte if escolha == 'Norte' else sul if escolha == 'Sul' else leste if escolha == 'Leste' else oeste}")
                 return
-            else:
-                print("Número inválido. Tente novamente.")
-                
+
         except ValueError:
-            print("Por favor, digite um número válido.")
+            print("Por favor, digite uma direção válida.")
 
 
 # Menu principal
@@ -218,7 +253,7 @@ def menu_jogo(jogador):
             print("1. Selecionar Personagem")
         else:
             print("1. Mapa")
-            
+
         print("2. Sair")
 
         opcao = input("Escolha: ")
