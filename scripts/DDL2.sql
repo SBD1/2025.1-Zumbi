@@ -25,7 +25,7 @@ CREATE TABLE TipoZumbi (
 
 -- Tabela Personagem
 CREATE TABLE Personagem (
-    IDPersonagem SERIAL INT PRIMARY KEY,
+    IDPersonagem SERIAL PRIMARY KEY,
     Nome VARCHAR(255),
     VidaAtual INT,
     IDConta INT,
@@ -190,13 +190,4 @@ CREATE TABLE Personagem_Dialogos (
     FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
 );
 
--- Tabela de relacionamento entre Local e Missao (Ocorrem em)
-CREATE TABLE Local_Missao (
-    IDLocal INT,
-    IDMissao INT,
-    PRIMARY KEY (IDLocal, IDMissao),
-    FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal),
-    FOREIGN KEY (IDMissao) REFERENCES Missao(IDMissao)
-);
-
-
+-- Tabela1
