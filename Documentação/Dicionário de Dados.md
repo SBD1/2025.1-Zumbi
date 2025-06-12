@@ -3,13 +3,15 @@
 ## Visão geral das tabelas
 Clique em uma tabela e seja diretamente direcionado para ela.
 
-| [Conta](#entidade-conta) | [Personagem](#entidade-personagem) | [ClasseItens](#entidade-classeitens) |
+| [Conta](#entidade-conta) | [Personagem](#entidade-personagem) | [Classeltens](#entidade-classeltens) |
 |:----------------------------:|:------------------------------------:|:---------------------------------------------:|
-| **[ArmaBranca](#entidade-armabranca)** | **[InstanciaItens](#entidade-instanciaitens)** | **[Arma_de_Fogo](#entidade-arma_de_fogo)**|
-|**[Inventario](#entidade-inventario)** |**[Locais](#entidade-locais)** | **[AparecemEm (Itens)](#entidade-aparecemem-itens)** |
-| **[Zumbi](#entidade-zumbi)** | **[AparecemEm (Zumbi)](#entidade-aparecemem-zumbis)** | **[Missões](#entidade-missões)** |
-|**[Dialogos](#entidade-dialogos)** | **[Contem (Dialogo-Mensagem)](#entidade-contem-diálogo-mensagem)** |**[MensagemDialogo](#entidade-mensagemdialogo)** |
-|**[GatilhoDialogo](#entidade-gatilhodialogo)** | **[ÉAtivadoPor](#entidade-éativadopor)** | **[InterageCom](#entidade-interagecom)** |
+| **[ArmaBranca](#entidade-armabranca)** | **[Instancias_Itens](#entidade-instancias_itens)** | **[ArmaDeFogo](#entidade-armadefogo)**|
+|**[Inventario](#entidade-inventario)** |**[Local](#entidade-local)** | **[Local_Instancias_Itens](#entidade-local_instancias_itens)** |
+| **[Instancia_Zumbi](#entidade-instancia_zumbi)** | **[Local_Instancia_Zumbi](#entidade-local_instancia_zumbi)** | **[Missao](#entidade-missao)** |
+|**[Dialogos](#entidade-dialogos)** | **[MensagensDialogos](#entidade-mensagensdialogos)** |**[Personagem_Missao](#entidade-personagem_missao)** |
+|**[TipoZumbi](#entidade-tipozumbi)** | **[Zumbi_Comum](#entidade-zumbi_comum)** | **[Zumbi_Infeccioso](#entidade-zumbi_infeccioso)** |
+|**[Zumbi_Brutamonte](#entidade-zumbi_brutamonte)** | **[Chaves](#entidade-chaves)** | **[Local_Chaves](#entidade-local_chaves)** |
+|**[Medicamentos](#entidade-medicamentos)** | **[Dialogos_Missao](#entidade-dialogos_missao)** |
 
 
 ## Entidade: Conta
@@ -20,79 +22,73 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | Campo   | Tipo    | Tamanho | Descrição                       | Restrições        |
 | ------- | ------- | ------- | ------------------------------- | ----------------- |
 | IDConta | integer |         | Identificador único da conta    | PK / Identity     |
-| Email   | varchar |         | E-mail do usuário               | Unique / Not Null |
-| Senha   | varchar |         | Senha do usuário                | Not Null          |
-| Status  | integer |         | Status da conta (ativo/inativo) | Not Null          |
+| Email   | varchar | 100     | E-mail do usuário               | Unique / Not Null |
+| Senha   | varchar | 50      | Senha do usuário                | Not Null          |
+| Status  | boolean |         | Status da conta (ativo/inativo) | Not Null          |
 
 
 
 ## Entidade: Personagem
 **Descrição**: Armazena os dados dos personagens dos jogadores.
 
-**Observações**: Associado à Conta e à Inventário.
+**Observações**: Associado à Conta.
 
 | Campo        | Tipo    | Tamanho | Descrição                         | Restrições    |
 | ------------ | ------- | ------- | --------------------------------- | ------------- |
 | IDPersonagem | integer |         | Identificador único do personagem | PK / Identity |
-| Nome         | varchar |         | Nome do personagem                | Not Null      |
-| Nivel        | integer |         | Nível do personagem em XP         | Not Null      |
-| VidaMaxima   | integer |         | Vida máxima do personagem         | Not Null      |
-| VidaAtual    | integer |         | Vida atual do personagem em porcentagem   | Not Null      |
+| Nome         | varchar | 50      | Nome do personagem                | Not Null      |
+| VidaAtual    | integer |         | Vida atual do personagem          | Not Null      |
 | IDConta      | integer |         | Chave estrangeira para Conta      | FK            |
-| IDInventario | integer |         | Chave estrangeira para Inventário | FK            |
 
 
 
-## Entidade: ClasseItens
+## Entidade: Classeltens
 **Descrição**: Define categorias e atributos base para itens do jogo.
 
-**Observações**: É a generalização Total e Conjuntiva de Arma_de_Fogo e ArmaBranca. Por isso, na prática, ela não existe em nível mais baixo.
+**Observações**: Define as classes de itens disponíveis no jogo.
 
 | Campo         | Tipo    | Tamanho | Descrição                             | Restrições    |
 | ------------- | ------- | ------- | ------------------------------------- | ------------- |
-| IDClasseItens | integer |         | Identificador único da classe de item | PK / Identity |
-| Nome          | varchar |         | Nome do item                          | Not Null      |
+| IDClasseltens | integer |         | Identificador único da classe de item | PK / Identity |
+| Nome          | varchar | 50      | Nome do item                          | Not Null      |
 
 
 
-## Entidade: Arma_de_Fogo
+## Entidade: ArmaDeFogo
 **Descrição**: Define atributos específicos de armas de fogo.
 
-**Observações**: Especialização de ClasseItens.
+**Observações**: Especialização de Classeltens.
 
 | Campo         | Tipo    | Tamanho | Descrição                          | Restrições |
 | ------------- | ------- | ------- | ---------------------------------- | ---------- |
-| IDClasseItens | integer |         | Chave estrangeira para ClasseItens | PK / FK    |
-| Nome          | varchar |         | Nome da arma de fogo               | Not Null   |
+| IDArmaDeFogo  | integer |         | Identificador único da arma        | PK / Identity |
 | Munição       | integer |         | Quantidade de munição              | Not Null   |
+| Dano_maximo   | integer |         | Dano máximo da arma                | Not Null   |
 
 
 
 ## Entidade: ArmaBranca
 **Descrição**: Define atributos específicos de armas brancas.
 
-**Observações**: Especialização de ClasseItens.
+**Observações**: Especialização de Classeltens.
 
 | Campo         | Tipo    | Tamanho | Descrição                          | Restrições |
 | ------------- | ------- | ------- | ---------------------------------- | ---------- |
-| IDClasseItens | integer |         | Chave estrangeira para ClasseItens | PK / FK    |
-| Nome          | varchar |         | Nome da arma branca                | Not Null   |
-| DanoCorte     | integer |         | Dano de corte em porcentagem       | Not Null   |
+| IDArmaBranca  | integer |         | Identificador único da arma        | PK / Identity |
+| Dano_maximo   | integer |         | Dano máximo da arma                | Not Null   |
 
 
 
-## Entidade: InstanciaItens
+## Entidade: Instancias_Itens
 **Descrição**: Registra itens específicos no mundo do jogo.
 
-**Observações**: Relaciona-se com classes_itens e inventário.
+**Observações**: Relaciona-se com Classeltens e Inventario.
 
 | Campo            | Tipo    | Tamanho | Descrição                                             | Restrições    |
 | ---------------- | ------- | ------- | ----------------------------------------------------- | ------------- |
-| IDInstanciaItens | integer |         | Identificador único da instância de item              | PK / Identity |
-| Quantidade       | integer |         | Quantidade de itens                                   | Not Null      |
+| IDInstanciaItem  | integer |         | Identificador único da instância de item              | PK / Identity |
+| IDClasseltens    | integer |         | Chave estrangeira para Classe de Itens                | FK            |
 | IDInventario     | integer |         | Chave estrangeira para Inventário                     | FK            |
-| IDClasseItens    | integer |         | Chave estrangeira para Classe de Itens                | FK            |
-| IDArmaBranca     | integer |         | Chave estrangeira para Arma Branca (quando aplicável) | FK            |
 
 
 
@@ -105,145 +101,207 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | ---------------- | ------- | ------- | --------------------------------- | ------------- |
 | IDInventario     | integer |         | Identificador único do inventário | PK / Identity |
 | CapacidadeMaxima | integer |         | Capacidade máxima de itens        | Not Null      |
+| IDPersonagem     | integer |         | Chave estrangeira para Personagem | FK            |
 
 
 
-## Entidade: Locais
+## Entidade: Local
 **Descrição**: Descreve áreas do mapa do jogo.
 
-**Observações**: Relacionado a personagens, zumbis e itens.
+**Observações**: Relacionado a zumbis e itens.
 
 | Campo        | Tipo    | Tamanho | Descrição                         | Restrições    |
 | ------------ | ------- | ------- | --------------------------------- | ------------- |
 | IDLocal      | integer |         | Identificador único do local      | PK / Identity |
-| Nome         | varchar |         | Nome do local                     | Not Null      |
-| Coordenadas  | varchar |         | Coordenadas do local              | Not Null      |
-| IDPersonagem | integer |         | Chave estrangeira para Personagem | FK            |
+| Nome         | varchar | 50      | Nome do local                     | Not Null      |
+| Precisa_Chave| boolean |         | Indica se o local requer chave    | Not Null      |
 
 
 
-## Entidade: AparecemEm (Itens)
+## Entidade: Local_Instancias_Itens
 **Descrição**: Relaciona itens instanciados com locais.
 
-**Observações**: Relacionamento entre InstanciasItens e Locais
+**Observações**: Relacionamento entre Instancias_Itens e Local.
 
 | Campo            | Tipo    | Tamanho | Descrição                             | Restrições |
 | ---------------- | ------- | ------- | ------------------------------------- | ---------- |
-| IDInstanciaItens | integer |         | Chave estrangeira para InstanciaItens | PK / FK    |
+| IDInstanciaItem  | integer |         | Chave estrangeira para Instancia_Itens| PK / FK    |
 | IDLocal          | integer |         | Chave estrangeira para Local          | PK / FK    |
 
 
 
-## Entidade: Zumbi
+## Entidade: Instancia_Zumbi
 **Descrição**: Registra zumbis no jogo e seus atributos.
 
-**Observações**: Relacionado a Locais.
+**Observações**: Relacionado a Local.
 
-| Campo    | Tipo    | Tamanho | Descrição                    | Restrições    |
-| -------- | ------- | ------- | ---------------------------- | ------------- |
-| IDZumbi  | integer |         | Identificador único do zumbi | PK / Identity |
-| Nivel    | integer |         | Nível do zumbi em XP         | Not Null      |
-| DanoBase | integer |         | Dano base do zumbi em porcentagem  | Not Null      |
+| Campo            | Tipo    | Tamanho | Descrição                    | Restrições    |
+| ---------------- | ------- | ------- | ---------------------------- | ------------- |
+| IDInstanciaZumbi | integer |         | Identificador único do zumbi | PK / Identity |
+| VidaAtual        | integer |         | Vida atual do zumbi          | Not Null      |
+| IDLocal          | integer |         | Chave estrangeira para Local | FK            |
 
 
 
-## Entidade: AparecemEm (Zumbis)
+## Entidade: Local_Instancia_Zumbi
 **Descrição**: Relaciona zumbis com locais.
 
-**Observações**: Ligação entre Zumbi e Locais.
+**Observações**: Ligação entre Instancia_Zumbi e Local.
 
-| Campo   | Tipo    | Tamanho | Descrição                    | Restrições |
-| ------- | ------- | ------- | ---------------------------- | ---------- |
-| IDZumbi | integer |         | Chave estrangeira para Zumbi | PK / FK    |
-| IDLocal | integer |         | Chave estrangeira para Local | PK / FK    |
+| Campo            | Tipo    | Tamanho | Descrição                    | Restrições |
+| ---------------- | ------- | ------- | ---------------------------- | ---------- |
+| IDInstanciaZumbi | integer |         | Chave estrangeira para Zumbi | PK / FK    |
+| IDLocal          | integer |         | Chave estrangeira para Local | PK / FK    |
 
 
 
-## Entidade: Missões
+## Entidade: Missao
 **Descrição**: Define missões disponíveis no jogo.
 
-**Observações**: Relacionada a Personagem e Locais.
+**Observações**: Relacionada a Personagem e Dialogos.
 
 | Campo        | Tipo    | Tamanho | Descrição                          | Restrições    |
 | ------------ | ------- | ------- | ---------------------------------- | ------------- |
 | IDMissao     | integer |         | Identificador único da missão      | PK / Identity |
-| Nome         | varchar |         | Nome da missão                     | Not Null      |
-| Descricao    | varchar |         | Descrição da missão                | Not Null      |
-| Recompensa   | varchar |         | Recompensa da missão               | Not Null      |
-| Status       | integer |         | Status da missão (ativa/concluída) | Not Null      |
-| IDPersonagem | integer |         | Chave estrangeira para Personagem  | FK            |
-| IDLocal      | integer |         | Chave estrangeira para Local       | FK            |
+| Nome         | varchar | 50      | Nome da missão                     | Not Null      |
+| Descricao    | varchar | 200     | Descrição da missão                | Not Null      |
+| Recompensa   | varchar | 100     | Recompensa da missão               | Not Null      |
+| Status       | varchar | 20      | Status da missão                   | Not Null      |
 
 
 
 ## Entidade: Dialogos
 **Descrição**: Armazena diálogos do jogo (NPCs, tutoriais, etc.).
 
-**Observações**: Relacionado a interações e mensagens.
+**Observações**: Relacionado a missões e mensagens.
 
 | Campo     | Tipo    | Tamanho | Descrição                      | Restrições    |
 | --------- | ------- | ------- | ------------------------------ | ------------- |
 | IDDialogo | integer |         | Identificador único do diálogo | PK / Identity |
-| Titulo    | varchar |         | Título do diálogo              | Not Null      |
+| Titulo    | varchar | 100     | Título do diálogo              | Not Null      |
 
 
 
-## Entidade: MensagemDialogo
+## Entidade: MensagensDialogos
 **Descrição**: Contém as mensagens que ocorrem em um diálogo.
 
-**Observações**: Relaciona-se com a tabela Contem.
+**Observações**: Relaciona-se com Dialogos.
 
-| Campo     | Tipo    | Tamanho | Descrição                      | Restrições    |
-| --------- | ------- | ------- | ------------------------------ | ------------- |
-| IDMensagemDialogo | integer |         | Identificador único do diálogo | PK / Identity |
-| Texto    | varchar |         | Texto da mensagem              | Not Null      |
-| OrdemExibicao    | integer |         | Diz em que ordem uma mensagem está por meio de um inteiro     | Not Null      |
+| Campo             | Tipo    | Tamanho | Descrição                      | Restrições    |
+| ----------------- | ------- | ------- | ------------------------------ | ------------- |
+| IDMensagemDialogo | integer |         | Identificador único da mensagem| PK / Identity |
+| Texto             | varchar | 500     | Texto da mensagem              | Not Null      |
+| Ordem_de_Exibicao | integer |         | Ordem de exibição da mensagem  | Not Null      |
+| IDDialogo         | integer |         | Chave estrangeira para Diálogo | FK            |
 
 
-## Entidade: Contem (Diálogo-Mensagem)
-**Descrição**: Relaciona diálogos com suas mensagens.
+
+## Entidade: Personagem_Missao
+**Descrição**: Relaciona personagens com missões.
 
 **Observações**: Associação N:N.
-
-| Campo             | Tipo    | Tamanho | Descrição                       | Restrições |
-| ----------------- | ------- | ------- | ------------------------------- | ---------- |
-| IDDialogo         | integer |         | Chave estrangeira para Diálogo  | PK / FK    |
-| IDMensagemDialogo | integer |         | Chave estrangeira para Mensagem | PK / FK    |
-
-
-
-## Entidade: InterageCom
-**Descrição**: Relaciona personagens com diálogos.
-
-**Observações**: Associação de interações.
 
 | Campo        | Tipo    | Tamanho | Descrição                         | Restrições |
 | ------------ | ------- | ------- | --------------------------------- | ---------- |
 | IDPersonagem | integer |         | Chave estrangeira para Personagem | PK / FK    |
-| IDDialogo    | integer |         | Chave estrangeira para Diálogo    | PK / FK    |
+| IDMissao     | integer |         | Chave estrangeira para Missão     | PK / FK    |
 
 
 
-## Entidade: GatilhoDialogo
-**Descrição**: Define condições para disparar diálogos.
+## Entidade: TipoZumbi
+**Descrição**: Define os tipos base de zumbis.
 
-**Observações**:Associado a Dialogos.
+**Observações**: Classe base para tipos específicos de zumbis.
 
-| Campo     | Tipo    | Tamanho | Descrição                      | Restrições    |
-| --------- | ------- | ------- | ------------------------------ | ------------- |
-| IDGatilho | integer |         | Identificador único do gatilho | PK / Identity |
-| Descricao | varchar |         | Descrição do gatilho           | Not Null      |
+| Campo        | Tipo    | Tamanho | Descrição                    | Restrições    |
+| ------------ | ------- | ------- | ---------------------------- | ------------- |
+| IDTipoZumbi  | integer |         | Identificador único do tipo  | PK / Identity |
+| DanoBase     | integer |         | Dano base do tipo            | Not Null      |
 
 
 
-## Entidade: ÉAtivadoPor
-**Descrição**: Relaciona diálogos com os gatilhos que os ativam.
+## Entidade: Zumbi_Comum
+**Descrição**: Define características dos zumbis comuns.
 
-**Observações**:Associação de ativação.
+**Observações**: Especialização de TipoZumbi.
 
-| Campo     | Tipo    | Tamanho | Descrição                      | Restrições |
-| --------- | ------- | ------- | ------------------------------ | ---------- |
-| IDDialogo | integer |         | Chave estrangeira para Diálogo | PK / FK    |
-| IDGatilho | integer |         | Chave estrangeira para Gatilho | PK / FK    |
+| Campo         | Tipo    | Tamanho | Descrição                    | Restrições |
+| ------------- | ------- | ------- | ---------------------------- | ---------- |
+| IDZumbiComum  | integer |         | Identificador único          | PK / Identity |
+| DanoBase      | integer |         | Dano base do zumbi           | Not Null   |
+
+
+
+## Entidade: Zumbi_Infeccioso
+**Descrição**: Define características dos zumbis infecciosos.
+
+**Observações**: Especialização de TipoZumbi.
+
+| Campo             | Tipo    | Tamanho | Descrição                    | Restrições |
+| ----------------- | ------- | ------- | ---------------------------- | ---------- |
+| IDZumbiInfeccioso | integer |         | Identificador único          | PK / Identity |
+| Taxa_Infeccao     | integer |         | Taxa de infecção             | Not Null   |
+| DanoBase          | integer |         | Dano base do zumbi           | Not Null   |
+
+
+
+## Entidade: Zumbi_Brutamonte
+**Descrição**: Define características dos zumbis brutamontes.
+
+**Observações**: Especialização de TipoZumbi.
+
+| Campo              | Tipo    | Tamanho | Descrição                    | Restrições |
+| ------------------ | ------- | ------- | ---------------------------- | ---------- |
+| IDZumbiBrutamonte  | integer |         | Identificador único          | PK / Identity |
+| Resistencia_a_bala | boolean |         | Resistência a balas          | Not Null   |
+| DanoBase           | integer |         | Dano base do zumbi           | Not Null   |
+
+
+
+## Entidade: Chaves
+**Descrição**: Define as chaves do jogo.
+
+**Observações**: Usadas para acessar locais restritos.
+
+| Campo      | Tipo    | Tamanho | Descrição                    | Restrições    |
+| ---------- | ------- | ------- | ---------------------------- | ------------- |
+| IDChave    | integer |         | Identificador único da chave | PK / Identity |
+| Nome_Chave | varchar | 50      | Nome da chave                | Not Null      |
+
+
+
+## Entidade: Local_Chaves
+**Descrição**: Relaciona locais com suas chaves necessárias.
+
+**Observações**: Associação N:N.
+
+| Campo    | Tipo    | Tamanho | Descrição                    | Restrições |
+| -------- | ------- | ------- | ---------------------------- | ---------- |
+| IDLocal  | integer |         | Chave estrangeira para Local | PK / FK    |
+| IDChave  | integer |         | Chave estrangeira para Chave | PK / FK    |
+
+
+
+## Entidade: Medicamentos
+**Descrição**: Define características dos medicamentos.
+
+**Observações**: Usados para recuperação de vida.
+
+| Campo          | Tipo    | Tamanho | Descrição                    | Restrições    |
+| -------------- | ------- | ------- | ---------------------------- | ------------- |
+| IDMedicamentos | integer |         | Identificador único          | PK / Identity |
+| Ganho_vida     | integer |         | Quantidade de vida recuperada| Not Null      |
+
+
+
+## Entidade: Dialogos_Missao
+**Descrição**: Relaciona diálogos com missões.
+
+**Observações**: Associação N:N.
+
+| Campo     | Tipo    | Tamanho | Descrição                    | Restrições |
+| --------- | ------- | ------- | ---------------------------- | ---------- |
+| IDDialogo | integer |         | Chave estrangeira para Diálogo| PK / FK    |
+| IDMissao  | integer |         | Chave estrangeira para Missão | PK / FK    |
 
 
