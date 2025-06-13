@@ -74,17 +74,17 @@ INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, IDInventario) VALU
 (15, 10, 10); -- Pedro possui água potável
 
 -- Inserindo dados na tabela Local
-INSERT INTO Local (IDLocal, Nome, Precisa_Chave) VALUES
-(1, 'Rua Principal', FALSE),
-(2, 'Hospital Abandonado', TRUE),
-(3, 'Delegacia', TRUE),
-(4, 'Base Militar', TRUE),
-(5, 'Supermercado', FALSE),
-(6, 'Farmácia', TRUE),
-(7, 'Estação de Rádio', TRUE),
-(8, 'Depósito de Construção', TRUE),
-(9, 'Escola', FALSE),
-(10, 'Centro Comercial', TRUE);
+INSERT INTO Local (IDLocal, Nome, Precisa_Chave, Norte, Sul, Leste, Oeste) VALUES
+(1, 'Rua Principal', FALSE, 2, 5, 3, NULL),           -- Norte: Hospital, Sul: Supermercado, Leste: Delegacia
+(2, 'Hospital Abandonado', TRUE, NULL, 1, 4, NULL),   -- Sul: Rua Principal, Leste: Base Militar
+(3, 'Delegacia', TRUE, 4, 6, NULL, 1),                -- Norte: Base Militar, Sul: Farmácia, Oeste: Rua Principal
+(4, 'Base Militar', TRUE, NULL, 3, 7, 2),             -- Sul: Delegacia, Leste: Estação, Oeste: Hospital
+(5, 'Supermercado', FALSE, 1, 9, 6, NULL),            -- Norte: Rua Principal, Sul: Escola, Leste: Farmácia
+(6, 'Farmácia', TRUE, 3, 10, NULL, 5),                -- Norte: Delegacia, Sul: Centro Comercial, Oeste: Supermercado
+(7, 'Estação de Rádio', TRUE, NULL, 8, NULL, 4),      -- Sul: Depósito, Oeste: Base Militar
+(8, 'Depósito de Construção', TRUE, 7, NULL, 9, NULL),-- Norte: Estação, Leste: Escola
+(9, 'Escola', FALSE, 5, NULL, 10, 8),                 -- Norte: Supermercado, Leste: Centro, Oeste: Depósito
+(10, 'Centro Comercial', TRUE, 6, NULL, NULL, 9);     -- Norte: Farmácia, Oeste: Escola
 
 -- Inserindo dados na tabela Missao
 INSERT INTO Missao (IDMissao, Nome, Descricao, Recompensa, Status) VALUES
