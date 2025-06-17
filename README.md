@@ -2,7 +2,8 @@
 Repositorio destinado a elaboração do trabalhando de Sistemas de Bancos de Dados 1
 
 ## entregas
-### Entrega 1 https://youtu.be/VV2hEdlKEuM
+### Entrega 1: https://youtu.be/VV2hEdlKEuM
+### Entrega 2: https://youtu.be/z4bq-0e0XDc
 
 
 ## Grupo 10
