@@ -5,22 +5,23 @@ CREATE TABLE Conta (
     Senha VARCHAR(255),
     Status INT 
 );
+
 -- Tabela Local
 CREATE TABLE Local (
     IDLocal INT PRIMARY KEY,
     Nome VARCHAR(255),
-    Precisa_Chave BOOLEAN, -- ou INT se precisar de um ID de chave específico
+    Precisa_Chave BOOLEAN,
     Norte INT, FOREIGN KEY(Norte) REFERENCES Local(IDLocal), 
-    Sul INT,  FOREIGN KEY(Sul) REFERENCES Local(IDLocal), 
-    Leste INT,  FOREIGN KEY(Leste) REFERENCES Local(IDLocal), 
-    Oeste INT,  FOREIGN KEY(Oeste) REFERENCES Local(IDLocal)
+    Sul INT, FOREIGN KEY(Sul) REFERENCES Local(IDLocal), 
+    Leste INT, FOREIGN KEY(Leste) REFERENCES Local(IDLocal), 
+    Oeste INT, FOREIGN KEY(Oeste) REFERENCES Local(IDLocal)
 );
 
--- Tabela TipoZumbi (Herança)
+-- Tabela TipoZumbi
 CREATE TABLE TipoZumbi (
     IDTipoZumbi INT PRIMARY KEY,
-    -- Atributos comuns
-    DanoBase INT
+    DanoBase INT, 
+    Nome VARCHAR(255)
 );
 
 -- Tabela Personagem
@@ -29,17 +30,9 @@ CREATE TABLE Personagem (
     Nome VARCHAR(255),
     VidaAtual INT,
     IDConta INT,
-    IDLocal INT, 
-    FOREIGN KEY (IDConta) REFERENCES Conta(IDConta), 
+    IDLocal INT,
+    FOREIGN KEY (IDConta) REFERENCES Conta(IDConta),
     FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal)
-);
-
--- Tabela Inventario
-CREATE TABLE Inventario (
-    IDInventario INT PRIMARY KEY,
-    CapacidadeMaxima INT,
-    IDPersonagem INT,
-    FOREIGN KEY (IDPersonagem) REFERENCES Personagem(IDPersonagem)
 );
 
 -- Tabela Classeltens
@@ -72,6 +65,7 @@ CREATE TABLE Chaves (
 -- Tabela ArmaDeFogo
 CREATE TABLE ArmaDeFogo (
     IDArmaDeFogo INT PRIMARY KEY,
+    Nome VARCHAR(255),
     Munição INT,
     Dano_maximo INT
 );
@@ -79,12 +73,14 @@ CREATE TABLE ArmaDeFogo (
 -- Tabela ArmaBranca
 CREATE TABLE ArmaBranca (
     IDArmaBranca INT PRIMARY KEY,
+    Nome VARCHAR(255),
     Dano_maximo INT
 );
 
 -- Tabela Medicamentos
 CREATE TABLE Medicamentos (
     IDMedicamentos INT PRIMARY KEY,
+    Nome VARCHAR(255),
     Ganho_vida INT
 );
 
@@ -97,13 +93,13 @@ CREATE TABLE MensagensDialogos (
     FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
 );
 
--- Tabela Instancias_Itens
+-- Tabela Instancias_Itens (agora com relação direta ao personagem)
 CREATE TABLE Instancias_Itens (
     IDInstanciaItem INT PRIMARY KEY,
     IDClasseltens INT,
-    IDInventario INT,
+    IDPersonagem INT,
     FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens),
-    FOREIGN KEY (IDInventario) REFERENCES Inventario(IDInventario)
+    FOREIGN KEY (IDPersonagem) REFERENCES Personagem(IDPersonagem)
 );
 
 -- Tabela Instancia_Zumbi
@@ -111,8 +107,8 @@ CREATE TABLE Instancia_Zumbi (
     IDInstanciaZumbi INT PRIMARY KEY,
     VidaAtual INT,
     IDLocal INT,
-    IDTipoZumbi INT, 
-    FOREIGN KEY (IDTipoZumbi) REFERENCES TipoZumbi(IDTipoZumbi), 
+    IDTipoZumbi INT,
+    FOREIGN KEY (IDTipoZumbi) REFERENCES TipoZumbi(IDTipoZumbi),
     FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal)
 );
 
@@ -128,7 +124,7 @@ CREATE TABLE Zumbi_Infeccioso (
     IDZumbiInfeccioso INT PRIMARY KEY,
     Taxa_Infeccao INT,
     DanoBase INT,
-     FOREIGN KEY (IDZumbiInfeccioso) REFERENCES TipoZumbi(IDTipoZumbi)
+    FOREIGN KEY (IDZumbiInfeccioso) REFERENCES TipoZumbi(IDTipoZumbi)
 );
 
 -- Tabela Zumbi_Brutamonte
@@ -172,7 +168,6 @@ CREATE TABLE Dialogos_Missao (
     FOREIGN KEY (IDMissao) REFERENCES Missao(IDMissao)
 );
 
--- Falta a tabela de relacionamento entre Chaves e Local (Abre)
 CREATE TABLE Local_Chaves (
     IDLocal INT,
     IDChave INT,
@@ -181,7 +176,6 @@ CREATE TABLE Local_Chaves (
     FOREIGN KEY (IDChave) REFERENCES Chaves(IDChave)
 );
 
--- Tabela de relacionamento entre Personagem e Dialogos (Interage com)
 CREATE TABLE Personagem_Dialogos (
     IDPersonagem INT,
     IDDialogo INT,
@@ -189,5 +183,3 @@ CREATE TABLE Personagem_Dialogos (
     FOREIGN KEY (IDPersonagem) REFERENCES Personagem(IDPersonagem),
     FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
 );
-
--- Tabela1
