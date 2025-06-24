@@ -1,9 +1,10 @@
 import psycopg2
 import random
+import os
 
 # Conexão com o banco
 conn = psycopg2.connect(
-    dbname="Zumbi2",
+    dbname="Zumbi",
     user="postgres",
     password="",
     host="localhost",
@@ -13,6 +14,10 @@ cursor = conn.cursor()
 
 # Variável global para guardar o personagem selecionado
 personagem_selecionado = None
+
+
+def clear_terminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def login():
     print("Você possui conta? Y/N \n")
@@ -27,6 +32,7 @@ def login():
         jogador = cursor.fetchone()
 
         if jogador:
+            clear_terminal()
             print(f"\nBem-vindo, {email}!\n")
             menu_jogo(jogador)
         else:
@@ -55,6 +61,7 @@ def login():
             print(f"Erro ao criar conta: {e}")
 
 def SelecionarPersonagem(jogador):
+    clear_terminal()
     global personagem_selecionado
 
     cursor.execute(
@@ -78,13 +85,17 @@ def SelecionarPersonagem(jogador):
             if 1 <= opcao <= len(personagens):
                 personagem_selecionado = personagens[opcao - 1][0]  # idpersonagem
                 print(f"\nPersonagem '{personagens[opcao - 1][1]}' selecionado!\n")
+                clear_terminal()
                 return
             else:
+                clear_terminal()
                 print("Opção inválida. Tente novamente.")
+             
         except ValueError:
             print("Digite um número válido.")
-
+            
 def CriarPersonagem(jogador):
+    clear_terminal()
     nome_personagem = input("Digite o nome do seu novo personagem: ")
 
     try:
@@ -100,6 +111,7 @@ def CriarPersonagem(jogador):
         print(f"Erro ao criar personagem: {e}")
 
 def Mapa():
+    clear_terminal()
     global personagem_selecionado
 
     if personagem_selecionado is None:
@@ -147,6 +159,7 @@ def Mapa():
             print("Opção inválida.")
 
 def Movimentar():
+    clear_terminal()
     global personagem_selecionado
 
     if personagem_selecionado is None:
@@ -238,27 +251,55 @@ def Movimentar():
             print("Por favor, digite uma direção válida.")
 
 def ver_inventario():
+    clear_terminal()
     global personagem_selecionado
     
     if personagem_selecionado is None:
         print("Nenhum personagem selecionado.")
         return
     
-    # Obtém o ID do inventário do personagem
-    cursor.execute(
-        "SELECT idinventario FROM inventario where idpersonagem = %s",
-        (personagem_selecionado,))
-    id_inventario = cursor.fetchone()[0]
-    
-    # Busca os itens no inventário
+    # Busca os itens no inventário com todas as informações
     cursor.execute(
         """
-        SELECT ii.IDInstanciaItem, ci.Nome
-        FROM Instancias_Itens ii
-        JOIN Classeltens ci ON ii.IDClasseltens = ci.IDClasseltens
-        WHERE ii.IDInventario = %s
+       SELECT 
+    ii.IDInstanciaItem,
+    c.tipos_itens AS TipoItem,
+    CASE
+        WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Nome
+        WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Nome
+        WHEN c.tipos_itens = 'Medicamentos' THEN m.Nome
+        WHEN c.tipos_itens = 'Chave' THEN ch.Nome_Chave
+        ELSE 'Desconhecido'
+    END AS NomeItem,
+    CASE
+        WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Dano_maximo
+        WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Dano_maximo
+        WHEN c.tipos_itens = 'Medicamentos' THEN m.Ganho_vida
+        ELSE NULL
+    END AS Valor,
+    CASE
+        WHEN c.tipos_itens = 'ArmaDeFogo' THEN CONCAT('Munição: ', af.Munição)
+        ELSE ''
+    END AS Detalhe
+FROM 
+    Instancias_Itens ii
+JOIN 
+    Classeltens c ON c.IDClasseltens = ii.IDClasseltens
+LEFT JOIN 
+    ArmaDeFogo af ON af.IDClasseltens = c.IDClasseltens
+LEFT JOIN 
+    ArmaBranca ab ON ab.IDClasseltens = c.IDClasseltens
+LEFT JOIN 
+    Medicamentos m ON m.IDClasseltens = c.IDClasseltens
+LEFT JOIN 
+    Chaves ch ON ch.IDClasseltens = c.IDClasseltens
+WHERE 
+    ii.IDPersonagem = %s
+ORDER BY
+    c.tipos_itens, ii.IDInstanciaItem;
+
         """,
-        (id_inventario,))
+        (personagem_selecionado,))
     
     itens = cursor.fetchall()
     
@@ -267,104 +308,244 @@ def ver_inventario():
         return
     
     print("\n📦 Inventário:")
-    for id_item_instancia, nome_item in itens:
-        print(f"- {nome_item}")
+    print("-" * 40)
+    
+    for id_item, tipo, nome, valor, detalhe in itens:
+        # Formata a exibição de acordo com o tipo de item
+        if tipo == 'ArmaDeFogo':
+            print(f"🔫 {nome} (Dano: {valor}) | {detalhe}")
+        elif tipo == 'ArmaBranca':
+            print(f"🔪 {nome} (Dano: {valor})")
+        elif tipo == 'Medicamentos':
+            print(f"💊 {nome} (Cura: {valor})")
+        elif tipo == 'Chave':
+            print(f"🔑 {nome}")
+        else:
+            print(f"❓ {nome} (Tipo desconhecido)")
+    
+    print("-" * 40)
 
 def verificar_itens_no_local(id_local):
+    clear_terminal()
     global personagem_selecionado
 
+    if personagem_selecionado is None:
+        print("Nenhum personagem selecionado.")
+        input("\nPressione Enter para continuar...")
+        return
+
+    # Busca itens no local com informações completas
     cursor.execute(
         """
-       SELECT I.idinstanciaitem, C.nome FROM public.local_instancias_itens I
-join instancias_itens II on II.idinstanciaitem = I.idinstanciaitem
-join classeltens C on II.idclasseltens = C.idclasseltens
-where idlocal = %s
-
+        SELECT 
+            ii.IDInstanciaItem,
+            c.tipos_itens AS TipoItem,
+            CASE
+                WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Nome
+                WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Nome
+                WHEN c.tipos_itens = 'Medicamentos' THEN m.Nome
+                WHEN c.tipos_itens = 'Chave' THEN ch.Nome_Chave
+                ELSE 'Desconhecido'
+            END AS NomeItem,
+            CASE
+                WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Dano_maximo
+                WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Dano_maximo
+                WHEN c.tipos_itens = 'Medicamentos' THEN m.Ganho_vida
+                ELSE NULL
+            END AS Valor
+        FROM Instancias_Itens ii
+        JOIN Classeltens c ON c.IDClasseltens = ii.IDClasseltens
+        LEFT JOIN ArmaDeFogo af ON af.IDClasseltens = c.IDClasseltens
+        LEFT JOIN ArmaBranca ab ON ab.IDClasseltens = c.IDClasseltens
+        LEFT JOIN Medicamentos m ON m.IDClasseltens = c.IDClasseltens
+        LEFT JOIN Chaves ch ON ch.IDClasseltens = c.IDClasseltens
+        WHERE ii.IDLocal = %s
+          AND ii.IDPersonagem IS NULL
+          AND ii.Localizacao = 'Local';
         """,
         (id_local,)
     )
     itens_no_local = cursor.fetchall()
 
-    if itens_no_local:
-        print("\nVocê encontrou os seguintes itens neste local:")
-        for id_instancia, nome_item in itens_no_local:
-            print(f"- {nome_item} (ID Instância: {id_instancia})")
-        
-        coletar = input("\nDeseja coletar estes itens? (Y/N): ").upper()
-        if coletar == 'Y':
-            coletar_itens(itens_no_local)
-    else:
+    if not itens_no_local:
         print("\nNão há itens para coletar neste local.")
+        input("\nPressione Enter para continuar...")
+        return
 
-def coletar_itens(itens_para_coletar):
-    global personagem_selecionado
+    print("\n📦 Itens disponíveis no local:")
+    for idx, (id_instancia, tipo, nome, valor) in enumerate(itens_no_local, start=1):
+        if tipo == 'ArmaDeFogo':
+            print(f"{idx}. 🔫 {nome} (Dano: {valor})")
+        elif tipo == 'ArmaBranca':
+            print(f"{idx}. 🔪 {nome} (Dano: {valor})")
+        elif tipo == 'Medicamentos':
+            print(f"{idx}. 💊 {nome} (Cura: {valor})")
+        elif tipo == 'Chave':
+            print(f"{idx}. 🔑 {nome}")
+        else:
+            print(f"{idx}. ❓ {nome}")
 
-    # Obtém o ID do inventário do personagem
-    cursor.execute(
-        "SELECT IDInventario FROM Personagem WHERE IDPersonagem = %s",
-        (personagem_selecionado,))
-    id_inventario_personagem = cursor.fetchone()[0]
+    print(f"\n0. Voltar (não coletar nada)")
 
-    for id_instancia_item, nome_item in itens_para_coletar:
+    # Selecionar itens para coletar
+    while True:
         try:
-            # Atualiza o IDInventario na tabela Instancias_Itens
+            escolhas = input("\nDigite os números dos itens que deseja coletar (separados por vírgula): ").strip()
+            if escolhas == '0':
+                return
+            
+            if not escolhas:
+                print("Por favor, digite algum valor.")
+                continue
+
+            indices = []
+            for i in escolhas.split(','):
+                if i.strip().isdigit():
+                    num = int(i.strip())
+                    if 1 <= num <= len(itens_no_local):
+                        indices.append(num)
+                    else:
+                        print(f"Índice inválido: {num}")
+            
+            if not indices:
+                print("Nenhum item válido selecionado.")
+                continue
+
+            ids_para_coletar = [itens_no_local[i-1][0] for i in indices]
+
+            # Executa a stored procedure
             cursor.execute(
-                "UPDATE Instancias_Itens SET IDInventario = %s WHERE IDInstanciaItem = %s",
-                (id_inventario_personagem, id_instancia_item)
+                "SELECT coletar_itens(%s, %s::int[])",
+                (personagem_selecionado, ids_para_coletar)
             )
-            # Remove o item da tabela Local_Instancias_Itens
-            cursor.execute(
-                "DELETE FROM Local_Instancias_Itens WHERE IDInstanciaItem = %s",
-                (id_instancia_item,)
-            )
+            resultado = cursor.fetchone()
             conn.commit()
-            print(f"Item '{nome_item}' coletado com sucesso!")
+
+            clear_terminal()
+            print(resultado[0])  # Mostra a mensagem da função coletar_itens
+            break
+
+        except (ValueError, IndexError):
+            print("Entrada inválida. Digite números separados por vírgula.")
         except psycopg2.Error as e:
             conn.rollback()
-            print(f"Erro ao coletar item '{nome_item}': {e}")
-
+            print(f"\n❌ Erro no banco de dados: {e}")
+      
+def selecionar_arma(personagem_id):
+    cursor.execute("""
+        SELECT 
+            ii.IDInstanciaItem,
+            c.tipos_itens AS TipoItem,
+            CASE 
+                WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Nome
+                WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Nome
+                ELSE NULL
+            END AS NomeArma,
+            CASE
+                WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Dano_maximo
+                WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Dano_maximo
+                ELSE NULL
+            END AS Dano
+        FROM Instancias_Itens ii
+        JOIN Classeltens c ON c.IDClasseltens = ii.IDClasseltens
+        LEFT JOIN ArmaDeFogo af ON af.IDClasseltens = c.IDClasseltens AND c.tipos_itens = 'ArmaDeFogo'
+        LEFT JOIN ArmaBranca ab ON ab.IDClasseltens = c.IDClasseltens AND c.tipos_itens = 'ArmaBranca'
+        WHERE ii.IDPersonagem = %s 
+        AND c.tipos_itens IN ('ArmaDeFogo', 'ArmaBranca')
+    """, (personagem_id,))
+    
+    armas = cursor.fetchall()
+    
+    if not armas:
+        print("❌ Você não possui armas para usar no combate!")
+        return None
+    
+    print("\n🔫 Armas disponíveis:")
+    for i, (id_item, tipo, nome_arma, dano) in enumerate(armas, start=1):
+        tipo_formatado = "Arma de fogo" if tipo == "ArmaDeFogo" else "Arma branca"
+        print(f"{i}. {nome_arma} ({tipo_formatado}) | Dano: {dano}")
+    
+    while True:
+        try:
+            escolha = int(input("\nEscolha o número da arma que deseja usar (0 para cancelar): "))
+            if escolha == 0:
+                return None
+            if 1 <= escolha <= len(armas):
+                return armas[escolha - 1]  # Retorna (id_item, tipo, nome_arma, dano)
+            print("Escolha inválida!")
+        except ValueError:
+            print("Digite um número válido!")
 
 def combate():
+    clear_terminal()
     global personagem_selecionado
 
     if personagem_selecionado is None:
         print("Nenhum personagem selecionado.")
         return
 
-    # Pega local e vida atual do personagem
-    cursor.execute("SELECT IDLocal, VidaAtual, Nome FROM Personagem WHERE IDPersonagem = %s", (personagem_selecionado,))
+    arma_escolhida = selecionar_arma(personagem_selecionado)
+    if arma_escolhida is None:
+        print("Combate cancelado ou nenhuma arma selecionada.")
+        return
+
+    id_item, tipo_arma, nome_arma, dano_arma = arma_escolhida
+    print(f"\nVocê escolheu: {nome_arma} (Dano: {dano_arma})")
+
+    # Obtém localização, vida e munição (caso seja arma de fogo)
+    cursor.execute("""
+        SELECT p.IDLocal, p.VidaAtual, p.Nome,
+               CASE 
+                   WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Munição
+                   ELSE NULL
+               END AS Municao
+        FROM Personagem p
+        LEFT JOIN Instancias_Itens ii ON ii.IDPersonagem = p.IDPersonagem AND ii.IDInstanciaItem = %s
+        LEFT JOIN Classeltens c ON c.IDClasseltens = ii.IDClasseltens
+        LEFT JOIN ArmaDeFogo af ON af.IDClasseltens = c.IDClasseltens
+        WHERE p.IDPersonagem = %s
+    """, (id_item, personagem_selecionado))
+
     resultado = cursor.fetchone()
     if not resultado:
         print("Personagem não encontrado.")
         return
-    id_local, vida_personagem, nome_personagem = resultado
 
-    # Busca todos os zumbis no local
+    id_local, vida_personagem, nome_personagem, municao = resultado
+    usando_arma_fogo = tipo_arma == 'ArmaDeFogo'
+    infectado = False
+
+    # Busca zumbis vivos no local
     cursor.execute("""
-         SELECT iz.IDInstanciaZumbi, iz.VidaAtual, tz.DanoBase, tz.nome
+        SELECT iz.IDInstanciaZumbi, iz.VidaAtual, tz.DanoBase, tz.Nome, tz.IDTipoZumbi,
+               zb.Resistencia_a_bala, zi.Taxa_Infeccao
         FROM Instancia_Zumbi iz
-        JOIN Local_Instancia_Zumbi liz ON liz.IDInstanciaZumbi = iz.IDInstanciaZumbi
         JOIN TipoZumbi tz ON tz.IDTipoZumbi = iz.IDTipoZumbi
-        WHERE liz.IDLocal =%s and iz.vidaatual>0
+        LEFT JOIN Zumbi_Brutamonte zb ON zb.IDZumbiBrutamonte = tz.IDTipoZumbi
+        LEFT JOIN Zumbi_Infeccioso zi ON zi.IDZumbiInfeccioso = tz.IDTipoZumbi
+        WHERE iz.IDLocal = %s AND iz.VidaAtual > 0
     """, (id_local,))
 
     zumbis = cursor.fetchall()
-
     if not zumbis:
-        print("Não há zumbis no local para combater.")
+        print("\nNão há zumbis no local para combater.\n")
         return
 
-    # Lista os zumbis para escolher
     print("\nZumbis no local:")
-    for i, (id_zumbi,vidazumbi, dano, nome) in enumerate(zumbis, start=1):
-        print(f"{i}. Zumbi {nome} | Vida: {vidazumbi} | Dano Base: {dano}")
+    for i, (id_zumbi, vida_zumbi, dano_zumbi, nome_zumbi, id_tipo, resistencia, taxa_infeccao) in enumerate(zumbis, start=1):
+        tipo_especial = ""
+        if resistencia:
+            tipo_especial = " [Brutamonte - Resistente a balas]"
+        elif taxa_infeccao:
+            tipo_especial = f" [Infeccioso - Taxa de infecção: {taxa_infeccao}%]"
+        print(f"{i}. Zumbi {nome_zumbi} | Vida: {vida_zumbi} | Dano: {dano_zumbi}{tipo_especial}")
 
-    # Escolher zumbi para combater
+    # Escolha do zumbi
     while True:
         try:
-            escolha = int(input("Escolha o número do zumbi para combater (0 para cancelar): "))
+            escolha = int(input("\nEscolha o número do zumbi para combater (0 para cancelar): "))
             if escolha == 0:
-                print("Combate cancelado.")
+                print("\nCombate cancelado.")
                 return
             if 1 <= escolha <= len(zumbis):
                 zumbi_selecionado = zumbis[escolha - 1]
@@ -374,44 +555,82 @@ def combate():
         except ValueError:
             print("Digite um número válido.")
 
-    id_zumbi, vida_zumbi, dano_zumbi, id_tipo_zumbi = zumbi_selecionado
+    id_zumbi, vida_zumbi, dano_zumbi, nome_zumbi, _, resistencia, taxa_infeccao = zumbi_selecionado
+    zumbi_brutamonte = resistencia is not None and resistencia
+    zumbi_infeccioso = taxa_infeccao is not None and taxa_infeccao > 0
 
-    # Atributos do personagem (exemplo fixo, pode buscar no banco se quiser)
-    ataque_personagem = 15
-    defesa_personagem = 5
+    print(f"\nIniciando combate com o Zumbi {nome_zumbi} usando {nome_arma}!")
 
-    print(f"\nIniciando combate com o Zumbi ID {id_zumbi} (Tipo {id_tipo_zumbi})!\n")
+    if zumbi_brutamonte and usando_arma_fogo:
+        print("⚠️ Este zumbi Brutamonte é resistente a balas!")
+    if zumbi_infeccioso:
+        print(f"☣️ Este zumbi Infeccioso pode contaminar você (Taxa: {taxa_infeccao}%)!")
 
     while vida_personagem > 0 and vida_zumbi > 0:
-        
-        print(f"{nome_personagem} - Vida: {vida_personagem}")
-        print(f"Zumbi {nome} - Vida: {vida_zumbi}")
+        print(f"\n{nome_personagem} - Vida: {vida_personagem}")
+        print(f"Zumbi {nome_zumbi} - Vida: {vida_zumbi}")
+        if usando_arma_fogo:
+            print(f"Munição: {municao}")
+        if infectado:
+            print("☣️ VOCÊ ESTÁ INFECTADO! Use um medicamento logo após o combate!")
 
         print("\n1. Atacar")
         print("2. Fugir")
         opcao = input("Escolha: ")
 
         if opcao == "1":
-            dano_causado = max(0, ataque_personagem - random.randint(0, 3))
+            if usando_arma_fogo and (municao is None or municao <= 0):
+                print("Sem munição! Você não pode atacar com esta arma.")
+                continue
+
+            dano_causado = max(1, dano_arma - random.randint(0, 3))
+            if zumbi_brutamonte and usando_arma_fogo:
+                dano_causado = max(1, int(dano_causado * 0.2))
+                print("O zumbi Brutamonte resiste ao dano de bala!")
+
             vida_zumbi -= dano_causado
-            print(f"Você causou {dano_causado} de dano no zumbi!")
-            cursor.execute(""" UPDATE Instancia_Zumbi SET VidaAtual = %s WHERE IDInstanciaZumbi = %s """, (vida_zumbi, id_zumbi))
+
+            if usando_arma_fogo:
+                municao -= 1
+                cursor.execute("""
+                    UPDATE ArmaDeFogo
+                    SET Munição = %s
+                    WHERE IDClasseltens = (
+                        SELECT IDClasseltens
+                        FROM Instancias_Itens
+                        WHERE IDInstanciaItem = %s
+                    )
+                """, (municao, id_item))
+
+            print(f"\nVocê causou {dano_causado} de dano no zumbi usando {nome_arma}!")
+            cursor.execute("""
+                UPDATE Instancia_Zumbi 
+                SET VidaAtual = %s 
+                WHERE IDInstanciaZumbi = %s
+            """, (vida_zumbi, id_zumbi))
             conn.commit()
+            clear_terminal()
 
             if vida_zumbi <= 0:
-                print("Zumbi derrotado!")
-                conn.commit()
+                print(f"Zumbi {nome_zumbi} derrotado!")
+                if zumbi_infeccioso and random.randint(1, 100) <= taxa_infeccao:
+                    infectado = True
+                    print(f"☣️ VOCÊ FOI INFECTADO pelo zumbi {nome_zumbi}!")
                 break
 
-            # Zumbi ataca
-            dano_recebido = max(0, dano_zumbi - defesa_personagem)
+            dano_recebido = max(1, dano_zumbi - random.randint(0, 3))
+            if zumbi_infeccioso and random.randint(1, 100) <= taxa_infeccao:
+                infectado = True
+                print("☣️ O zumbi infeccioso te contaminou!")
+
             vida_personagem -= dano_recebido
             print(f"O zumbi causou {dano_recebido} de dano em você!")
 
-            cursor.execute(
-                "UPDATE Personagem SET VidaAtual = %s WHERE IDPersonagem = %s",
-                (max(0, vida_personagem), personagem_selecionado)
-            )
+            cursor.execute("""
+                UPDATE Personagem 
+                SET VidaAtual = %s 
+                WHERE IDPersonagem = %s
+            """, (max(0, vida_personagem), personagem_selecionado))
             conn.commit()
 
             if vida_personagem <= 0:
@@ -426,23 +645,136 @@ def combate():
                 break
             else:
                 print("Fuga falhou! O zumbi ataca!")
-                dano_recebido = max(0, dano_zumbi - defesa_personagem)
+                dano_recebido = max(1, dano_zumbi - random.randint(0, 3))
+                if zumbi_infeccioso and random.randint(1, 100) <= taxa_infeccao // 2:
+                    infectado = True
+                    print("☣️ O zumbi infeccioso te contaminou durante a fuga!")
+
                 vida_personagem -= dano_recebido
                 print(f"O zumbi causou {dano_recebido} de dano em você!")
 
-                cursor.execute(
-                    "UPDATE Personagem SET VidaAtual = %s WHERE IDPersonagem = %s",
-                    (max(0, vida_personagem), personagem_selecionado)
-                )
+                cursor.execute("""
+                    UPDATE Personagem 
+                    SET VidaAtual = %s 
+                    WHERE IDPersonagem = %s
+                """, (max(0, vida_personagem), personagem_selecionado))
                 conn.commit()
 
                 if vida_personagem <= 0:
                     print("Você morreu. Fim de jogo.")
+                    personagem_selecionado = None
                     break
         else:
             print("Opção inválida.")
 
+def info_personagem():
+    clear_terminal()
+    global personagem_selecionado
+    
+    if personagem_selecionado is None:
+        print("Nenhum personagem selecionado.")
+        return
+    
+    # Informações básicas do personagem
+    cursor.execute("""
+        SELECT p.Nome, p.VidaAtual, l.Nome AS LocalAtual
+        FROM Personagem p
+        JOIN Local l ON p.IDLocal = l.IDLocal
+        WHERE p.IDPersonagem = %s
+    """, (personagem_selecionado,))
+    personagem = cursor.fetchone()
+    
+    if not personagem:
+        print("Personagem não encontrado.")
+        return
+    
+    nome, vida, local = personagem
+    
+    print(f"\n👤 INFORMAÇÕES DO PERSONAGEM: {nome}")
+    print("═" * 50)
+    print(f"❤️ Vida Atual: {vida}/100")
+    print(f"📍 Local Atual: {local}")
+    print("─" * 50)
+    
+    # Itens no inventário
+    cursor.execute("""
+       SELECT 
+    c.tipos_itens AS TipoItem,
+    CASE
+        WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Nome
+        WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Nome
+        WHEN c.tipos_itens = 'Medicamentos' THEN m.Nome
+        WHEN c.tipos_itens = 'Chave' THEN ch.Nome_Chave
+        ELSE 'Desconhecido'
+    END AS NomeItem,
+    CASE
+        WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Dano_maximo
+        WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Dano_maximo
+        WHEN c.tipos_itens = 'Medicamentos' THEN m.Ganho_vida
+        ELSE NULL
+    END AS Valor,
+    CASE
+        WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Munição
+        ELSE NULL
+    END AS Municao
+FROM 
+    Instancias_Itens ii
+JOIN 
+    Classeltens c ON c.IDClasseltens = ii.IDClasseltens
+LEFT JOIN 
+    ArmaDeFogo af ON af.IDClasseltens = c.IDClasseltens
+LEFT JOIN 
+    ArmaBranca ab ON ab.IDClasseltens = c.IDClasseltens
+LEFT JOIN 
+    Medicamentos m ON m.IDClasseltens = c.IDClasseltens
+LEFT JOIN 
+    Chaves ch ON ch.IDClasseltens = c.IDClasseltens
+WHERE 
+    ii.IDPersonagem = %s
+ORDER BY 
+    c.tipos_itens;
+
+    """, (personagem_selecionado,))
+    
+    itens = cursor.fetchall()
+    
+    print("\n🎒 INVENTÁRIO:")
+    if itens:
+        for tipo, nome, valor, municao in itens:
+            if tipo == 'Arma de fogo':
+                print(f"🔫 {nome} (Dano: {valor}, Munição: {municao})")
+            elif tipo == 'Arma Branca':
+                print(f"🔪 {nome} (Dano: {valor})")
+            elif tipo == 'Medicamentos':
+                print(f"💊 {nome} (Cura: {valor})")
+            elif tipo == 'Chave':
+                print(f"🔑 {nome}")
+    else:
+        print("Vazio")
+    print("─" * 50)
+    
+    # Missões ativas
+    cursor.execute("""
+        SELECT m.Nome, m.Descricao, m.Status 
+        FROM Personagem_Missao pm
+        JOIN Missao m ON pm.IDMissao = m.IDMissao
+        WHERE pm.IDPersonagem = %s
+        ORDER BY m.Status
+    """, (personagem_selecionado,))
+    
+    missoes = cursor.fetchall()
+    
+    print("\n📜 MISSÕES:")
+    if missoes:
+        for nome, descricao, status in missoes:
+            print(f"• {nome} ({status})")
+            print(f"        {descricao}")
+    else:
+        print("Nenhuma missão ativa")
+    print("─" * 50)
+    
 def menu_jogo(jogador):
+    clear_terminal()
     while True:
         print("\n--- Menu ---")
         if personagem_selecionado is None:
@@ -451,9 +783,10 @@ def menu_jogo(jogador):
         else:
             print("1. Mapa")
             print("2. Ver Inventário")
-            print("3. Combate")  # <<< Aqui
+            print("3. Combate")
+            print("4. Informações do Personagem")  # Nova opção
 
-        print("4. Sair")
+        print("5. Sair")  # Aumentou para 5 opções
 
         opcao = input("Escolha: ")
 
@@ -466,14 +799,17 @@ def menu_jogo(jogador):
         elif opcao == "2" and personagem_selecionado:
             ver_inventario()
         elif opcao == "3" and personagem_selecionado:
-            combate()  # Chama o combate aqui
-        elif opcao == "4":
+            combate()
+        elif opcao == "4" and personagem_selecionado:  # Nova condição
+            info_personagem()
+        elif opcao == "5":
             print("Saindo...")
             break
         else:
             print("Opção inválida.")
 
+clear_terminal()
 login()
 
 cursor.close()
-conn.close()
+conn.close() 

@@ -35,11 +35,7 @@ CREATE TABLE Personagem (
     FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal)
 );
 
--- Tabela Classeltens
-CREATE TABLE Classeltens (
-    IDClasseltens INT PRIMARY KEY,
-    Nome VARCHAR(255)
-);
+
 
 -- Tabela Missao
 CREATE TABLE Missao (
@@ -55,33 +51,45 @@ CREATE TABLE Dialogos (
     IDDialogo INT PRIMARY KEY,
     Titulo VARCHAR(255)
 );
+CREATE TYPE tipos_itens AS ENUM ('ArmaBranca', 'ArmaDeFogo', 'Medicamentos', 'Chave'); 
+
+
+-- Tabela Classeltens
+CREATE TABLE Classeltens (
+    IDClasseltens INT PRIMARY KEY,
+    tipos_itens tipos_itens, 
+);
 
 -- Tabela Chaves
 CREATE TABLE Chaves (
-    IDChave INT PRIMARY KEY,
-    Nome_Chave VARCHAR(255)
+    IDClasseltens INT PRIMARY KEY,
+    Nome_Chave VARCHAR(255),
+     FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
 );
 
 -- Tabela ArmaDeFogo
 CREATE TABLE ArmaDeFogo (
-    IDArmaDeFogo INT PRIMARY KEY,
+    IDClasseltens INT PRIMARY KEY,
     Nome VARCHAR(255),
     Munição INT,
-    Dano_maximo INT
+    Dano_maximo INT,
+    FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
 );
 
 -- Tabela ArmaBranca
 CREATE TABLE ArmaBranca (
-    IDArmaBranca INT PRIMARY KEY,
+    IDClasseltens INT PRIMARY KEY,
     Nome VARCHAR(255),
-    Dano_maximo INT
+    Dano_maximo INT,
+     FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
 );
 
 -- Tabela Medicamentos
 CREATE TABLE Medicamentos (
-    IDMedicamentos INT PRIMARY KEY,
+    IDClasseltens INT PRIMARY KEY,
     Nome VARCHAR(255),
-    Ganho_vida INT
+    Ganho_vida INT,
+    FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
 );
 
 -- Tabela MensagensDialogos
@@ -93,15 +101,23 @@ CREATE TABLE MensagensDialogos (
     FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
 );
 
--- Tabela Instancias_Itens (agora com relação direta ao personagem)
+-- Tabela Instancias_Itens 
+CREATE TYPE origem_item AS ENUM ('Personagem', 'Local');
+
 CREATE TABLE Instancias_Itens (
     IDInstanciaItem INT PRIMARY KEY,
-    IDClasseltens INT,
+    IDClasseltens INT NOT NULL,
+    Localizacao origem_item NOT NULL,
+    IDLocal INT,
     IDPersonagem INT,
-    FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens),
+    CHECK (
+        (Localizacao = 'Local' AND IDLocal IS NOT NULL AND IDPersonagem IS NULL)
+        OR
+        (Localizacao = 'Personagem' AND IDPersonagem IS NOT NULL AND IDLocal IS NULL)
+    ),
+    FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal),
     FOREIGN KEY (IDPersonagem) REFERENCES Personagem(IDPersonagem)
 );
-
 -- Tabela Instancia_Zumbi
 CREATE TABLE Instancia_Zumbi (
     IDInstanciaZumbi INT PRIMARY KEY,
@@ -144,13 +160,6 @@ CREATE TABLE Personagem_Missao (
     FOREIGN KEY (IDMissao) REFERENCES Missao(IDMissao)
 );
 
-CREATE TABLE Local_Instancias_Itens (
-    IDLocal INT,
-    IDInstanciaItem INT,
-    PRIMARY KEY (IDLocal, IDInstanciaItem),
-    FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal),
-    FOREIGN KEY (IDInstanciaItem) REFERENCES Instancias_Itens(IDInstanciaItem)
-);
 
 CREATE TABLE Local_Instancia_Zumbi (
     IDLocal INT,
@@ -173,7 +182,7 @@ CREATE TABLE Local_Chaves (
     IDChave INT,
     PRIMARY KEY (IDLocal, IDChave),
     FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal),
-    FOREIGN KEY (IDChave) REFERENCES Chaves(IDChave)
+    FOREIGN KEY (IDChave) REFERENCES Chaves(IDClasseltens)
 );
 
 CREATE TABLE Personagem_Dialogos (
