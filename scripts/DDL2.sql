@@ -71,7 +71,6 @@ CREATE TABLE Chaves (
 CREATE TABLE ArmaDeFogo (
     IDClasseltens INT PRIMARY KEY,
     Nome VARCHAR(255),
-    Munição INT,
     Dano_maximo INT,
     FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
 );
@@ -110,6 +109,7 @@ CREATE TABLE Instancias_Itens (
     Localizacao origem_item NOT NULL,
     IDLocal INT,
     IDPersonagem INT,
+    Municao INT,  
     CHECK (
         (Localizacao = 'Local' AND IDLocal IS NOT NULL AND IDPersonagem IS NULL)
         OR

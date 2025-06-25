@@ -1,15 +1,15 @@
 -- Conta
-INSERT INTO Conta (Email, Senha, Status) VALUES
-('sobrevivente1@email.com', 'senha123', 1),
-('lider_resistencia@email.com', 'resistencia456', 1),
-('medico_solitario@email.com', 'curaZumbi!', 1),
-('explorador_oculto@email.com', 'segredo123', 1),
-('medica_campanha@email.com', 'curaZumbi789', 1),
-('ex_militar@email.com', 'estrategia321', 1),
-('caçador_zumbis@email.com', 'headshot123', 1),
-('engenheira_survival@email.com', 'construcao456', 1),
-('farmacêutica@email.com', 'remedio789', 1),
-('lider_comunidade@email.com', 'uniao123', 1);
+INSERT INTO Conta (IDConta, Email, Senha, Status) VALUES
+(1, 'sobrevivente1@email.com', 'senha123', 1),
+(2, 'lider_resistencia@email.com', 'resistencia456', 1),
+(3, 'medico_solitario@email.com', 'curaZumbi!', 1),
+(4, 'explorador_oculto@email.com', 'segredo123', 1),
+(5, 'medica_campanha@email.com', 'curaZumbi789', 1),
+(6, 'ex_militar@email.com', 'estrategia321', 1),
+(7, 'caçador_zumbis@email.com', 'headshot123', 1),
+(8, 'engenheira_survival@email.com', 'construcao456', 1),
+(9, 'farmacêutica@email.com', 'remedio789', 1),
+(10, 'lider_comunidade@email.com', 'uniao123', 1);
 
 -- Local
 INSERT INTO Local (IDLocal, Nome, Precisa_Chave, Norte, Sul, Leste, Oeste) VALUES
@@ -24,7 +24,24 @@ INSERT INTO Local (IDLocal, Nome, Precisa_Chave, Norte, Sul, Leste, Oeste) VALUE
 (9, 'Escola', FALSE, 5, NULL, 10, 8),
 (10, 'Centro Comercial', TRUE, 6, NULL, NULL, 9);
 
+-- TipoZumbi
+INSERT INTO TipoZumbi (IDTipoZumbi, DanoBase, Nome) VALUES
+(1, 15, 'Infeccioso'),
+(2, 20, 'Brutamonte'),
+(3, 10, 'Comum');
 
+-- Personagem
+INSERT INTO Personagem (IDPersonagem, Nome, VidaAtual, IDConta, IDLocal) VALUES
+(1, 'Ricardo', 100, 1, 1),
+(2, 'Sofia', 120, 2, 2),
+(3, 'Dr. Helena', 90, 3, 2),
+(4, 'Marco', 110, 4, 3),
+(5, 'Laura', 110, 5, 5),
+(6, 'Carlos', 130, 6, 4),
+(7, 'Lucas', 140, 7, 7),
+(8, 'Ana', 100, 8, 8),
+(9, 'Dra. Maria', 95, 9, 6),
+(10, 'Pedro', 125, 10, 9);
 
 -- Missao
 INSERT INTO Missao (IDMissao, Nome, Descricao, Recompensa, Status) VALUES
@@ -52,24 +69,6 @@ INSERT INTO Dialogos (IDDialogo, Titulo) VALUES
 (9, 'Dra. Maria pede ajuda com pesquisa'),
 (10, 'Pedro convoca reunião da comunidade');
 
--- TipoZumbi
-INSERT INTO TipoZumbi (IDTipoZumbi, DanoBase, Nome) VALUES
-(1, 15, 'Infeccioso'),
-(2, 20, 'Brutamonte'),
-(3, 10, 'Comum');
-
--- Zumbi_Comum
-INSERT INTO Zumbi_Comum (IDZumbiComum, DanoBase) VALUES
-(3, 10);
-
--- Zumbi_Infeccioso
-INSERT INTO Zumbi_Infeccioso (IDZumbiInfeccioso, Taxa_Infeccao, DanoBase) VALUES
-(1, 5, 15);
-
--- Zumbi_Brutamonte
-INSERT INTO Zumbi_Brutamonte (IDZumbiBrutamonte, Resistencia_a_bala, DanoBase) VALUES
-(2, TRUE, 20);
-
 -- Classeltens
 INSERT INTO Classeltens (IDClasseltens, tipos_itens) VALUES
 (1, 'ArmaDeFogo'),
@@ -77,74 +76,59 @@ INSERT INTO Classeltens (IDClasseltens, tipos_itens) VALUES
 (3, 'Medicamentos'),
 (4, 'Chave'),
 (5, 'ArmaDeFogo'),
-(6,'ArmaDeFogo'), 
+(6, 'ArmaDeFogo'), 
 (7, 'ArmaBranca'), 
 (8, 'ArmaBranca'), 
 (9, 'Medicamentos');
 
--- Chaves (como subclasse de Classeltens)
+-- Chaves
 INSERT INTO Chaves (IDClasseltens, Nome_Chave) VALUES
 (4, 'Chave do Hospital');
 
--- ArmaDeFogo (como subclasse de Classeltens)
-INSERT INTO ArmaDeFogo (IDClasseltens, Nome, Munição, Dano_maximo) VALUES
-(1, 'Pistola 9mm', 15, 30),
-(5, 'Escopeta', 5, 50),
-(6, 'Rifle de Precisão', 10, 80);
+-- ArmaDeFogo
+INSERT INTO ArmaDeFogo (IDClasseltens, Nome, Dano_maximo) VALUES
+(1, 'Pistola 9mm', 30),
+(5, 'Escopeta', 50),
+(6, 'Rifle de Precisão', 80);
 
--- ArmaBranca (como subclasse de Classeltens)
+-- ArmaBranca
 INSERT INTO ArmaBranca (IDClasseltens, Nome, Dano_maximo) VALUES
 (2, 'Faca', 15),
 (7, 'Machado', 25),
 (8, 'Taco de Beisebol', 20);
 
--- Medicamentos (como subclasse de Classeltens)
+-- Medicamentos
 INSERT INTO Medicamentos (IDClasseltens, Nome, Ganho_vida) VALUES
 (3, 'Curativo', 20),
 (9, 'Kit de Primeiros Socorros', 50);
 
--- Personagem
-INSERT INTO Personagem (Nome, VidaAtual, IDConta, IDLocal) VALUES
-('Ricardo', 100, 1, 1),
-('Sofia', 120, 2, 2),
-('Dr. Helena', 90, 3, 2),
-('Marco', 110, 4, 3),
-('Laura', 110, 5, 5),
-('Carlos', 130, 6, 4),
-('Lucas', 140, 7, 7),
-('Ana', 100, 8, 8),
-('Dra. Maria', 95, 9, 6),
-('Pedro', 125, 10, 9);
+-- Instancias_Itens com personagens
+INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDPersonagem, Municao) VALUES
+(1, 1, 'Personagem', 1, 15),  -- Pistola 9mm para Ricardo
+(2, 2, 'Personagem', 1, NULL),  -- Faca para Ricardo
+(3, 3, 'Personagem', 2, NULL),  -- Curativo para Sofia
+(4, 1, 'Personagem', 2, 15),  -- Pistola 9mm para Sofia
+(5, 3, 'Personagem', 3, NULL),  -- Curativo para Dr. Helena
+(6, 2, 'Personagem', 4, NULL),  -- Faca para Marco
+(7, 3, 'Personagem', 5, NULL),  -- Curativo para Laura
+(8, 5, 'Personagem', 6, 5),  -- Escopeta para Carlos
+(9, 4, 'Personagem', 7, NULL),  -- Chave para Lucas
+(10, 3, 'Personagem', 8, NULL), -- Curativo para Ana
+(11, 7, 'Personagem', 9, NULL), -- Machado para Dra. Maria
+(12, 6, 'Personagem', 10, 10), -- Rifle de Precisão para Pedro
+(13, 8, 'Personagem', 3, NULL),  -- Taco de Beisebol para Dr. Helena
+(14, 9, 'Personagem', 5, NULL);  -- Kit de Primeiros Socorros para Laura
 
--- Itens que estão com personagens (Localizacao = 'Personagem', IDPersonagem preenchido)
-INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDPersonagem) VALUES
-(1, 1, 'Personagem', 1),  -- Pistola 9mm para Ricardo
-(2, 2, 'Personagem', 1),  -- Faca para Ricardo
-(3, 3, 'Personagem', 2),  -- Curativo para Sofia
-(4, 1, 'Personagem', 2),  -- Pistola 9mm para Sofia
-(5, 3, 'Personagem', 3),  -- Curativo para Dr. Helena
-(6, 2, 'Personagem', 4),  -- Faca para Marco
-(7, 3, 'Personagem', 5),  -- Curativo para Laura
-(8, 5, 'Personagem', 6),  -- Escopeta para Carlos
-(9, 4, 'Personagem', 7),  -- Chave para Lucas
-(10, 3, 'Personagem', 8), -- Curativo para Ana
-(11, 7, 'Personagem', 9), -- Machado para Dra. Maria
-(12, 6, 'Personagem', 10), -- Rifle de Precisão para Pedro
-(13, 8, 'Personagem', 3),  -- Taco de Beisebol para Dr. Helena
-(14, 9, 'Personagem', 5);  -- Kit de Primeiros Socorros para Laura
-
-
--- Itens que estão em Locais (no chão)
-INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDLocal) VALUES
-(15, 1, 'Local', 1),  -- Pistola 9mm na Rua Principal
-(16, 4, 'Local', 2),  -- Chave no Hospital Abandonado
-(17, 7, 'Local', 3),  -- Machado na Delegacia
-(18, 9, 'Local', 6),  -- Kit de Primeiros Socorros na Farmácia
-(19, 5, 'Local', 4),  -- Escopeta na Base Militar
-(20, 8, 'Local', 8),  -- Taco de Beisebol no Depósito de Construção
-(21, 2, 'Local', 5),  -- Faca no Supermercado
-(22, 3, 'Local', 9);  -- Curativo na Escola
-
+-- Instancias_Itens em locais
+INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDLocal, Municao) VALUES
+(15, 1, 'Local', 1, 15),  -- Pistola 9mm na Rua Principal
+(16, 4, 'Local', 2, NULL),  -- Chave no Hospital Abandonado
+(17, 7, 'Local', 3, NULL),  -- Machado na Delegacia
+(18, 9, 'Local', 6, NULL),  -- Kit de Primeiros Socorros na Farmácia
+(19, 5, 'Local', 4, 5),  -- Escopeta na Base Militar
+(20, 8, 'Local', 8, NULL),  -- Taco de Beisebol no Depósito de Construção
+(21, 2, 'Local', 5, NULL),  -- Faca no Supermercado
+(22, 3, 'Local', 9, NULL);  -- Curativo na Escola
 
 -- Instancia_Zumbi
 INSERT INTO Instancia_Zumbi (IDInstanciaZumbi, VidaAtual, IDLocal, IDTipoZumbi) VALUES
@@ -159,6 +143,18 @@ INSERT INTO Instancia_Zumbi (IDInstanciaZumbi, VidaAtual, IDLocal, IDTipoZumbi) 
 (9, 100, 7, 3), -- Comum na Estação de Rádio
 (10, 45, 8, 1); -- Infeccioso no Depósito
 
+-- Zumbi_Comum
+INSERT INTO Zumbi_Comum (IDZumbiComum, DanoBase) VALUES
+(3, 10);
+
+-- Zumbi_Infeccioso
+INSERT INTO Zumbi_Infeccioso (IDZumbiInfeccioso, Taxa_Infeccao, DanoBase) VALUES
+(1, 5, 15);
+
+-- Zumbi_Brutamonte
+INSERT INTO Zumbi_Brutamonte (IDZumbiBrutamonte, Resistencia_a_bala, DanoBase) VALUES
+(2, TRUE, 20);
+
 -- Personagem_Missao
 INSERT INTO Personagem_Missao (IDPersonagem, IDMissao) VALUES
 (1, 1),
@@ -171,8 +167,6 @@ INSERT INTO Personagem_Missao (IDPersonagem, IDMissao) VALUES
 (7, 8),
 (8, 9),
 (9, 10);
-
-
 
 -- Local_Instancia_Zumbi
 INSERT INTO Local_Instancia_Zumbi (IDLocal, IDInstanciaZumbi) VALUES
