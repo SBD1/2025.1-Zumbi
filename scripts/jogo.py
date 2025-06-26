@@ -646,6 +646,7 @@ def descartar_item():
                 print("Número inválido. Digite um número da lista ou 0 para cancelar.")
         except ValueError:
             print("Por favor, digite um número válido.")
+
 def selecionar_arma(personagem_id):
     cursor.execute("""
         SELECT 
@@ -1023,9 +1024,9 @@ def info_personagem():
     print("\n🎒 INVENTÁRIO:")
     if itens:
         for tipo, nome, valor, municao in itens:
-            if tipo == 'Arma de fogo':
+            if tipo == 'ArmaDeFogo':
                 print(f"🔫 {nome} (Dano: {valor}, Munição: {municao})")
-            elif tipo == 'Arma Branca':
+            elif tipo == 'ArmaBranca':
                 print(f"🔪 {nome} (Dano: {valor})")
             elif tipo == 'Medicamentos':
                 print(f"💊 {nome} (Cura: {valor})")
@@ -1104,9 +1105,13 @@ def ver_missoes():
     print("\n📜 SUAS MISSÕES:")
     print("═" * 50)
     
-    for id_missao, nome, descricao, recompensa, status, progresso, total in missoes:
+    # Criar um dicionário para mapear IDs de missão para seus detalhes
+    missoes_dict = {missao[0]: missao for missao in missoes}
+    
+    # Mostrar as missões com números sequenciais
+    for i, (id_missao, nome, descricao, recompensa, status, progresso, total) in enumerate(missoes, 1):
         status_emoji = "✅" if status == "CONCLUIDA" else "⌛" if status == "ATIVA" else "❌"
-        print(f"\n{status_emoji} {nome} ({status})")
+        print(f"\n{i}. {status_emoji} {nome} ({status})")
         print(f"   {descricao}")
         print(f"   Recompensa: {recompensa}")
         
@@ -1123,20 +1128,15 @@ def ver_missoes():
             
         try:
             escolha = int(escolha)
-            missao_escolhida = None
-            for missao in missoes:
-                if missao[0] == escolha:
-                    missao_escolhida = missao
-                    break
-                    
-            if missao_escolhida:
+            if 1 <= escolha <= len(missoes):
+                # Pegar a missão pelo índice (subtraindo 1 porque a lista começa em 0)
+                missao_escolhida = missoes[escolha - 1]
                 detalhes_missao(missao_escolhida)
                 break
             else:
                 print("Número de missão inválido.")
         except ValueError:
             print("Por favor, digite um número válido.")
-
 def detalhes_missao(missao):
     id_missao, nome, descricao, recompensa, status, progresso, total = missao
     clear_terminal()
