@@ -19,8 +19,7 @@ CREATE TABLE Local (
 
 -- Tabela TipoZumbi
 CREATE TABLE TipoZumbi (
-    IDTipoZumbi INT PRIMARY KEY,
-    DanoBase INT, 
+    IDTipoZumbi INT PRIMARY KEY, 
     Nome VARCHAR(255)
 );
 
@@ -28,43 +27,27 @@ CREATE TABLE TipoZumbi (
 CREATE TABLE Personagem (
     IDPersonagem SERIAL PRIMARY KEY,
     Nome VARCHAR(255),
-    VidaAtual INT,
+    VidaAtual INT NOT NULL CHECK (VidaAtual >= 0 AND VidaAtual <= 100),
     IDConta INT,
     IDLocal INT,
     FOREIGN KEY (IDConta) REFERENCES Conta(IDConta),
     FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal)
 );
 
-
-
--- Tabela Missao
-CREATE TABLE Missao (
-    IDMissao INT PRIMARY KEY,
-    Nome VARCHAR(255),
-    Descricao TEXT,
-    Recompensa TEXT,
-    Status VARCHAR(50)
-);
-
--- Tabela Dialogos
-CREATE TABLE Dialogos (
-    IDDialogo INT PRIMARY KEY,
-    Titulo VARCHAR(255)
-);
-CREATE TYPE tipos_itens AS ENUM ('ArmaBranca', 'ArmaDeFogo', 'Medicamentos', 'Chave'); 
-
+-- Tipo ENUM para itens
+CREATE TYPE tipos_itens AS ENUM ('ArmaBranca', 'ArmaDeFogo', 'Medicamentos', 'Chave');
 
 -- Tabela Classeltens
 CREATE TABLE Classeltens (
     IDClasseltens INT PRIMARY KEY,
-    tipos_itens tipos_itens, 
+    tipos_itens tipos_itens
 );
 
 -- Tabela Chaves
 CREATE TABLE Chaves (
     IDClasseltens INT PRIMARY KEY,
     Nome_Chave VARCHAR(255),
-     FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
+    FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
 );
 
 -- Tabela ArmaDeFogo
@@ -80,7 +63,7 @@ CREATE TABLE ArmaBranca (
     IDClasseltens INT PRIMARY KEY,
     Nome VARCHAR(255),
     Dano_maximo INT,
-     FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
+    FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
 );
 
 -- Tabela Medicamentos
@@ -89,6 +72,12 @@ CREATE TABLE Medicamentos (
     Nome VARCHAR(255),
     Ganho_vida INT,
     FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
+);
+
+-- Tabela Dialogos
+CREATE TABLE Dialogos (
+    IDDialogo INT PRIMARY KEY,
+    Titulo VARCHAR(255)
 );
 
 -- Tabela MensagensDialogos
@@ -100,9 +89,10 @@ CREATE TABLE MensagensDialogos (
     FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
 );
 
--- Tabela Instancias_Itens 
+-- Tipo ENUM para origem de itens
 CREATE TYPE origem_item AS ENUM ('Personagem', 'Local');
 
+-- Tabela Instancias_Itens
 CREATE TABLE Instancias_Itens (
     IDInstanciaItem INT PRIMARY KEY,
     IDClasseltens INT NOT NULL,
@@ -116,12 +106,14 @@ CREATE TABLE Instancias_Itens (
         (Localizacao = 'Personagem' AND IDPersonagem IS NOT NULL AND IDLocal IS NULL)
     ),
     FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal),
+    FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens), 
     FOREIGN KEY (IDPersonagem) REFERENCES Personagem(IDPersonagem)
 );
+
 -- Tabela Instancia_Zumbi
 CREATE TABLE Instancia_Zumbi (
     IDInstanciaZumbi INT PRIMARY KEY,
-    VidaAtual INT,
+    VidaAtual INT NOT NULL CHECK (VidaAtual >= 0 AND VidaAtual <= 100),
     IDLocal INT,
     IDTipoZumbi INT,
     FOREIGN KEY (IDTipoZumbi) REFERENCES TipoZumbi(IDTipoZumbi),
@@ -151,15 +143,27 @@ CREATE TABLE Zumbi_Brutamonte (
     FOREIGN KEY (IDZumbiBrutamonte) REFERENCES TipoZumbi(IDTipoZumbi)
 );
 
+-- Tabela Missao (COM ALTERAÇÕES)
+CREATE TABLE Missao (
+    IDMissao INT PRIMARY KEY,
+    Nome VARCHAR(255),
+    Descricao TEXT,
+    Recompensa TEXT,
+    Status VARCHAR(50),
+    Tipo VARCHAR(20) NOT NULL DEFAULT 'COLETA',
+    Parametros JSONB,
+    TipoRecompensa VARCHAR(20)
+);
+
 -- Tabelas de relacionamento N:N
 CREATE TABLE Personagem_Missao (
     IDPersonagem INT,
     IDMissao INT,
+    Status VARCHAR(20) DEFAULT 'ATIVA',
     PRIMARY KEY (IDPersonagem, IDMissao),
     FOREIGN KEY (IDPersonagem) REFERENCES Personagem(IDPersonagem),
     FOREIGN KEY (IDMissao) REFERENCES Missao(IDMissao)
 );
-
 
 CREATE TABLE Local_Instancia_Zumbi (
     IDLocal INT,
