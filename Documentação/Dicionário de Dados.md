@@ -11,7 +11,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 |**[Dialogos](#entidade-dialogos)** | **[MensagensDialogos](#entidade-mensagensdialogos)** |**[Personagem_Missao](#entidade-personagem_missao)** |
 |**[TipoZumbi](#entidade-tipozumbi)** | **[Zumbi_Comum](#entidade-zumbi_comum)** | **[Zumbi_Infeccioso](#entidade-zumbi_infeccioso)** |
 |**[Zumbi_Brutamonte](#entidade-zumbi_brutamonte)** | **[Chaves](#entidade-chaves)** | **[Local_Chaves](#entidade-local_chaves)** |
-|**[Medicamentos](#entidade-medicamentos)** | **[Dialogos_Missao](#entidade-dialogos_missao)** |
+|**[Medicamentos](#entidade-medicamentos)** | **[Dialogos_Missao](#entidade-dialogos_missao)** |**[Personagem_Dialogos](#entidade-personagem_dialogos)** |
 
 
 ## Entidade: Conta
@@ -41,6 +41,16 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | IDConta      | integer |         | Chave estrangeira para Conta      | FK            |
 | IDLocal      | integer |         | Chave estrangeira para Local      | FK      |
 
+
+## Entidade: Personagem_Dialogos
+**Descrição**: 
+
+**Observações**:
+
+| Campo        | Tipo    | Tamanho | Descrição                         | Restrições    |
+| ------------ | ------- | ------- | --------------------------------- | ------------- |
+| IDPersonagem | integer |         |  Chave primária e estrangeira para Personagem | PK e FK |
+| IDDialogo    | integer |         | Chave primária e estrangeira para Dialogos    | PK e FK |
 
 
 ## Entidade: Classeltens
@@ -147,6 +157,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | IDInstanciaZumbi | integer |         | Identificador único do zumbi | PK / Identity |
 | VidaAtual        | integer |         | Vida atual do zumbi          | Not Null      |
 | IDLocal          | integer |         | Chave estrangeira para Local | FK            |
+| IDTipoZumbi      | integer |         | Chave estrangeira para Tipo Zumbi | FK       |
 
 
 
@@ -170,10 +181,12 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | Campo        | Tipo    | Tamanho | Descrição                          | Restrições    |
 | ------------ | ------- | ------- | ---------------------------------- | ------------- |
 | IDMissao     | integer |         | Identificador único da missão      | PK / Identity |
-| Nome         | varchar | 50      | Nome da missão                     | Not Null      |
-| Descricao    | varchar | 200     | Descrição da missão                | Not Null      |
-| Recompensa   | varchar | 100     | Recompensa da missão               | Not Null      |
-| Status       | varchar | 20      | Status da missão                   | Not Null      |
+| Nome         | varchar | 255     | Nome da missão                     | Not Null      |
+| Descricao    | text    |         | Descrição da missão                | Not Null      |
+| Recompensa   | text    |         | Recompensa da missão               | Not Null      |
+| Status       | varchar | 50      | Status da missão                   | Not Null      |
+| Tipo         | varchar | 20      |                                    | Not Null      |
+| TipoRecompensa | varchar | 20    |                                    | Not Null      |
 
 
 
@@ -212,6 +225,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | ------------ | ------- | ------- | --------------------------------- | ---------- |
 | IDPersonagem | integer |         | Chave estrangeira para Personagem | PK / FK    |
 | IDMissao     | integer |         | Chave estrangeira para Missão     | PK / FK    |
+| Status       | varchar | 20      |                                   |            |
 
 
 
@@ -234,7 +248,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo         | Tipo    | Tamanho | Descrição                    | Restrições |
 | ------------- | ------- | ------- | ---------------------------- | ---------- |
-| IDZumbiComum  | integer |         | Identificador único          | PK / Identity |
+| IDZumbiComum  | integer |         | Identificador único e Chave estrangeira para Tipo Zumbi | PK / FK    |
 | DanoBase      | integer |         | Dano base do zumbi           | Not Null   |
 
 
@@ -246,7 +260,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo             | Tipo    | Tamanho | Descrição                    | Restrições |
 | ----------------- | ------- | ------- | ---------------------------- | ---------- |
-| IDZumbiInfeccioso | integer |         | Identificador único          | PK / Identity |
+| IDZumbiInfeccioso | integer |         | Identificador único e Chave estrangeira para Tipo Zumbi | PK / FK    |
 | Taxa_Infeccao     | integer |         | Taxa de infecção             | Not Null   |
 | DanoBase          | integer |         | Dano base do zumbi           | Not Null   |
 
@@ -259,7 +273,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo              | Tipo    | Tamanho | Descrição                    | Restrições |
 | ------------------ | ------- | ------- | ---------------------------- | ---------- |
-| IDZumbiBrutamonte  | integer |         | Identificador único          | PK / Identity |
+| IDZumbiBrutamonte  | integer |         | Identificador único e Chave estrangeira para Tipo Zumbi  | PK / FK |
 | Resistencia_a_bala | boolean |         | Resistência a balas          | Not Null   |
 | DanoBase           | integer |         | Dano base do zumbi           | Not Null   |
 
