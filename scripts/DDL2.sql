@@ -10,6 +10,7 @@ CREATE TABLE Conta (
 CREATE TABLE Local (
     IDLocal INT PRIMARY KEY,
     Nome VARCHAR(255),
+    Descricao TEXT, 
     Precisa_Chave BOOLEAN,
     Norte INT, FOREIGN KEY(Norte) REFERENCES Local(IDLocal), 
     Sul INT, FOREIGN KEY(Sul) REFERENCES Local(IDLocal), 
@@ -163,14 +164,6 @@ CREATE TABLE Personagem_Missao (
     PRIMARY KEY (IDPersonagem, IDMissao),
     FOREIGN KEY (IDPersonagem) REFERENCES Personagem(IDPersonagem),
     FOREIGN KEY (IDMissao) REFERENCES Missao(IDMissao)
-);
-
-CREATE TABLE Local_Instancia_Zumbi (
-    IDLocal INT,
-    IDInstanciaZumbi INT,
-    PRIMARY KEY (IDLocal, IDInstanciaZumbi),
-    FOREIGN KEY (IDLocal) REFERENCES Local(IDLocal),
-    FOREIGN KEY (IDInstanciaZumbi) REFERENCES Instancia_Zumbi(IDInstanciaZumbi)
 );
 
 CREATE TABLE Dialogos_Missao (

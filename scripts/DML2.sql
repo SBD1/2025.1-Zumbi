@@ -1,19 +1,15 @@
--- 🌐 CONTA (primeiro, pois é referenciada por Personagem)
-INSERT INTO Conta (Email, Senha, Status) VALUES
-('sobrevivente@email.com', 'senhaApocalipse', 1);
+
 
 -- 🌍 LOCAIS (antes de Personagem e outros que referenciam Local)
-INSERT INTO Local (IDLocal, Nome, Precisa_Chave, Norte, Sul, Leste, Oeste) VALUES
-(1, 'Rua Principal', FALSE, 2, NULL, 3, NULL),
-(2, 'Hospital', TRUE, NULL, 1, 4, NULL),
-(3, 'Farmácia', TRUE, NULL, NULL, 5, 1),
-(4, 'Escola Abandonada', FALSE, NULL, NULL, NULL, 2),
-(5, 'Posto de Gasolina', TRUE, NULL, NULL, 6, 3),
-(6, 'Loja de Armas', TRUE, NULL, NULL, NULL, 5);
+INSERT INTO Local (IDLocal, Nome, Descricao, Precisa_Chave, Norte, Sul, Leste, Oeste) VALUES
+(1, 'Rua Principal', 'Uma avenida deserta com destroços espalhados. O silêncio é perturbador.', FALSE, 2, NULL, 3, NULL),
+(2, 'Hospital', 'Antigo hospital da cidade. Portas trancadas e sombras se movem dentro.', TRUE, NULL, 1, 4, NULL),
+(3, 'Farmácia', 'As prateleiras estão quase vazias. Um cheiro forte de produtos químicos ainda paira no ar.', TRUE, NULL, NULL, 5, 1),
+(4, 'Escola Abandonada', 'Salas vazias, quadros riscados... A infância deu lugar ao abandono.', FALSE, NULL, NULL, NULL, 2),
+(5, 'Posto de Gasolina', 'Tanques vazios e um brutamonte guardando a última gota de combustível.', TRUE, NULL, NULL, 6, 3),
+(6, 'Loja de Armas', 'Portas reforçadas. Só com a chave certa será possível entrar e se armar.', TRUE, NULL, NULL, NULL, 5);
 
--- 👤 PERSONAGEM (depois de Conta e Local existirem)
-INSERT INTO Personagem (Nome, VidaAtual, IDConta, IDLocal) VALUES
-('Elena', 100, 1, 1);
+
 
 -- 🔥 TIPO ZUMBI (antes de Instancia_Zumbi)
 INSERT INTO TipoZumbi (IDTipoZumbi, Nome) VALUES
@@ -97,7 +93,6 @@ INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDLoc
 (6, 6, 'Local', 5, NULL), -- Chave inglesa
 (7, 7, 'Local', 2, NULL), -- Antibiótico
 (8, 8, 'Local', 4, NULL), -- Chave da Loja de Armas
--- Novos itens
 (10, 11, 'Local', 1, NULL), -- Machado
 (11, 14, 'Local', 1, NULL), -- Analgésico
 (12, 13, 'Local', 2, NULL), -- Kit Médico
@@ -111,9 +106,6 @@ INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDLoc
 (20, 5, 'Local', 6, 12), -- Espingarda
 (21, 1, 'Local', 6, 15); -- Pistola 9mm
 
--- 🗺️ INVENTÁRIO INICIAL (depois de Classeltens e Personagem)
-INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDPersonagem, Municao) VALUES
-(9, 3, 'Personagem', 1, NULL); -- Curativo inicial
 
 -- 🎯 MISSÕES
 INSERT INTO Missao (IDMissao, Nome, Descricao, Recompensa, Status, Tipo, Parametros, TipoRecompensa) VALUES
@@ -123,13 +115,7 @@ INSERT INTO Missao (IDMissao, Nome, Descricao, Recompensa, Status, Tipo, Paramet
 (4, 'Combustível Vital', 'Derrote o brutamonte no posto e recupere suprimentos.', 'Espingarda e gasolina', 'Ativa', 'ELIMINAR_ZUMBIS', '{"quantidade": 1}', 'ARMA'),
 (5, 'Última Defesa', 'Obtenha a chave da loja de armas e prepare-se para o confronto final.', 'Acesso à loja de armas', 'Ativa', 'COLETA', '{"tipo_item": "Chave", "quantidade": 1}', 'CHAVE');
 
--- 🤝 PERSONAGEM x MISSÕES (depois de Personagem e Missao)
-INSERT INTO Personagem_Missao (IDPersonagem, IDMissao, Status) VALUES
-(1, 1, 'ATIVA'),
-(1, 2, 'ATIVA'),
-(1, 3, 'ATIVA'),
-(1, 4, 'ATIVA'),
-(1, 5, 'ATIVA');
+
 
 -- 💬 DIÁLOGOS
 INSERT INTO Dialogos (IDDialogo, Titulo) VALUES
@@ -154,8 +140,8 @@ INSERT INTO Dialogos_Missao (IDDialogo, IDMissao) VALUES
 (1, 1), (2, 1), (3, 2), (4, 3), (5, 4), (6, 5);
 
 -- 🧍 PERSONAGEM x DIÁLOGOS
-INSERT INTO Personagem_Dialogos (IDPersonagem, IDDialogo) VALUES
-(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6);
+--INSERT INTO Personagem_Dialogos (IDPersonagem, IDDialogo) VALUES
+--(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6);
 
 -- 🧟 TIPOS ESPECÍFICOS DE ZUMBI
 INSERT INTO Zumbi_Comum (IDZumbiComum, DanoBase) VALUES
