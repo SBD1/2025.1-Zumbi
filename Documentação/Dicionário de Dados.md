@@ -21,10 +21,10 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo   | Tipo    | Tamanho | Descrição                       | Restrições        |
 | ------- | ------- | ------- | ------------------------------- | ----------------- |
-| IDConta | integer |         | Identificador único da conta    | PK / Identity     |
-| Email   | varchar | 100     | E-mail do usuário               | Unique / Not Null |
-| Senha   | varchar | 50      | Senha do usuário                | Not Null          |
-| Status  | boolean |         | Status da conta (ativo/inativo) | Not Null          |
+| IDConta | serial |         | Identificador único da conta    | PK / Identity     |
+| Email   | varchar | 255     | E-mail do usuário               | Unique / Not Null |
+| Senha   | varchar | 255     | Senha do usuário                | Not Null          |
+| Status  | int |         | Status da conta (ativo/inativo) | Not Null          |
 
 
 
@@ -35,10 +35,11 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo        | Tipo    | Tamanho | Descrição                         | Restrições    |
 | ------------ | ------- | ------- | --------------------------------- | ------------- |
-| IDPersonagem | integer |         | Identificador único do personagem | PK / Identity |
-| Nome         | varchar | 50      | Nome do personagem                | Not Null      |
+| IDPersonagem | serial |         | Identificador único do personagem | PK / Identity |
+| Nome         | varchar | 255      | Nome do personagem                | Not Null      |
 | VidaAtual    | integer |         | Vida atual do personagem          | Not Null      |
 | IDConta      | integer |         | Chave estrangeira para Conta      | FK            |
+| IDLocal      | integer |         | Chave estrangeira para Local      | FK      |
 
 
 
@@ -50,8 +51,9 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | Campo         | Tipo    | Tamanho | Descrição                             | Restrições    |
 | ------------- | ------- | ------- | ------------------------------------- | ------------- |
 | IDClasseltens | integer |         | Identificador único da classe de item | PK / Identity |
-| Nome          | varchar | 50      | Nome do item                          | Not Null      |
+| tipo_itens    | tipo_itens |      | Tipo ENUM para itens                  | Not Null      |
 
+**tipo_itens**: tipo ENUM (enumeração) de itens, os quais são: arma branca, arma de fogo, medicamentos e chave.
 
 
 ## Entidade: ArmaDeFogo
@@ -61,8 +63,8 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo         | Tipo    | Tamanho | Descrição                          | Restrições |
 | ------------- | ------- | ------- | ---------------------------------- | ---------- |
-| IDArmaDeFogo  | integer |         | Identificador único da arma        | PK / Identity |
-| Munição       | integer |         | Quantidade de munição              | Not Null   |
+| IDClasseItens | integer |         | Identificador único da arma        | PK / FK    |
+| Nome          | varchar | 255     |                                    | Not Null   |
 | Dano_maximo   | integer |         | Dano máximo da arma                | Not Null   |
 
 
@@ -74,7 +76,8 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo         | Tipo    | Tamanho | Descrição                          | Restrições |
 | ------------- | ------- | ------- | ---------------------------------- | ---------- |
-| IDArmaBranca  | integer |         | Identificador único da arma        | PK / Identity |
+| IDClasseItens | integer |         | Identificador único da arma        | PK / FK    |
+| Nome          | varchar | 255     |                                    | Not Null   |
 | Dano_maximo   | integer |         | Dano máximo da arma                | Not Null   |
 
 
@@ -88,7 +91,10 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | ---------------- | ------- | ------- | ----------------------------------------------------- | ------------- |
 | IDInstanciaItem  | integer |         | Identificador único da instância de item              | PK / Identity |
 | IDClasseltens    | integer |         | Chave estrangeira para Classe de Itens                | FK            |
-| IDInventario     | integer |         | Chave estrangeira para Inventário                     | FK            |
+| Localizacao      |origem_item |         |                                                    | Not Nul       |
+| IDLocal          | integer |         |                                                       | FK            |
+| IDPersonagem     | integer |         |                                                       |               |
+| Municao          | integer |         |                                                       |               |
 
 
 
@@ -113,7 +119,8 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | Campo        | Tipo    | Tamanho | Descrição                         | Restrições    |
 | ------------ | ------- | ------- | --------------------------------- | ------------- |
 | IDLocal      | integer |         | Identificador único do local      | PK / Identity |
-| Nome         | varchar | 50      | Nome do local                     | Not Null      |
+| Nome         | varchar | 255      | Nome do local                     | Not Null      |
+| Descricao    | text    |         | Características do local          |               |
 | Precisa_Chave| boolean |         | Indica se o local requer chave    | Not Null      |
 
 
@@ -178,7 +185,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | Campo     | Tipo    | Tamanho | Descrição                      | Restrições    |
 | --------- | ------- | ------- | ------------------------------ | ------------- |
 | IDDialogo | integer |         | Identificador único do diálogo | PK / Identity |
-| Titulo    | varchar | 100     | Título do diálogo              | Not Null      |
+| Titulo    | varchar | 255     | Título do diálogo              | Not Null      |
 
 
 
@@ -190,7 +197,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | Campo             | Tipo    | Tamanho | Descrição                      | Restrições    |
 | ----------------- | ------- | ------- | ------------------------------ | ------------- |
 | IDMensagemDialogo | integer |         | Identificador único da mensagem| PK / Identity |
-| Texto             | varchar | 500     | Texto da mensagem              | Not Null      |
+| Texto             | text    |         | Texto da mensagem              | Not Null      |
 | Ordem_de_Exibicao | integer |         | Ordem de exibição da mensagem  | Not Null      |
 | IDDialogo         | integer |         | Chave estrangeira para Diálogo | FK            |
 
@@ -216,7 +223,7 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 | Campo        | Tipo    | Tamanho | Descrição                    | Restrições    |
 | ------------ | ------- | ------- | ---------------------------- | ------------- |
 | IDTipoZumbi  | integer |         | Identificador único do tipo  | PK / Identity |
-| DanoBase     | integer |         | Dano base do tipo            | Not Null      |
+| Nome     | varchar |  255       | Nome do tipo de zumbi            | Not Null      |
 
 
 
@@ -265,8 +272,8 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo      | Tipo    | Tamanho | Descrição                    | Restrições    |
 | ---------- | ------- | ------- | ---------------------------- | ------------- |
-| IDChave    | integer |         | Identificador único da chave | PK / Identity |
-| Nome_Chave | varchar | 50      | Nome da chave                | Not Null      |
+| IDClasseItens  | integer |     | Identificador único da chave | PK / FK       |
+| Nome_Chave | varchar | 255      | Nome da chave               | Not Null      |
 
 
 
@@ -289,7 +296,8 @@ Clique em uma tabela e seja diretamente direcionado para ela.
 
 | Campo          | Tipo    | Tamanho | Descrição                    | Restrições    |
 | -------------- | ------- | ------- | ---------------------------- | ------------- |
-| IDMedicamentos | integer |         | Identificador único          | PK / Identity |
+| IDClasseItens  | integer |         | Identificador único          | PK / FK       |
+| Nome           | varchar | 255     |                              | Not Null      |
 | Ganho_vida     | integer |         | Quantidade de vida recuperada| Not Null      |
 
 
