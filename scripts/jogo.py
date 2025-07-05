@@ -5,8 +5,8 @@ import os
 # Conexão com o banco
 conn = psycopg2.connect(
     dbname="Zumbi",
-    user="postgres",
-    password="felipe2910",
+    user="postgres", #nome do usuario - postgre é o padroa
+    password="", #senha do usuario do seu banco
     host="localhost",
     port="5432"
 )
