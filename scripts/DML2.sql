@@ -25,22 +25,74 @@ UPDATE Local SET Norte=12 WHERE IDLocal=13;
 INSERT INTO Classeltens (IDClasseltens, tipos_itens) VALUES
 (2, 'ArmaBranca'),
 (3, 'Medicamentos'),
+(4, 'Medicamentos'),
+(5, 'Medicamentos'),
+(6, 'ArmaDeFogo'),
+(7, 'ArmaBranca'),
+(8, 'Medicamentos'),
 (10, 'Chave');
 
 INSERT INTO ArmaBranca (IDClasseltens, Nome, Dano_maximo) VALUES
-(2, 'Faca', 15);
+(2, 'Faca', 15),
+(7, 'Machado', 25);
+
+INSERT INTO ArmaDeFogo (IDClasseltens, Nome, Dano_maximo) VALUES
+(6, 'Pistola', 30);
 
 INSERT INTO Medicamentos (IDClasseltens, Nome, Ganho_vida) VALUES
-(3, 'Curativo', 20);
+(3, 'Curativo', 20),
+(4, 'Kit Médico', 50),
+(5, 'Poção de Cura', 100),
+(8, 'Bandagem', 15);
 
 INSERT INTO Chaves (IDClasseltens, Nome_Chave) VALUES
 (10, 'Chave do 2º Andar');
 
 -- 🎒 ITENS NO MAPA
 INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDLocal, IDPersonagem, Municao) VALUES
+-- Recepção (Local 1)
 (1, 2, 'Local', 1, NULL, NULL),   -- Faca na recepção
+(8, 3, 'Local', 1, NULL, NULL),   -- Curativo na recepção
+
+-- Sala de Espera (Local 2)
+(9, 8, 'Local', 2, NULL, NULL),   -- Bandagem na sala de espera
+(10, 3, 'Local', 2, NULL, NULL),  -- Curativo na sala de espera
+
+-- Farmácia (Local 3)
+(3, 10, 'Local', 3, NULL, NULL),  -- Chave do 2º andar na farmácia
+(4, 4, 'Local', 3, NULL, NULL),   -- Kit Médico na farmácia
+(11, 8, 'Local', 3, NULL, NULL),  -- Bandagem na farmácia
+(12, 5, 'Local', 3, NULL, NULL),  -- Poção de Cura na farmácia (rara!)
+
+-- Consultório Médico (Local 4)
+(6, 3, 'Local', 4, NULL, NULL),   -- Curativo no consultório médico
+(13, 4, 'Local', 4, NULL, NULL),  -- Kit Médico no consultório médico
+(14, 8, 'Local', 4, NULL, NULL),  -- Bandagem no consultório médico
+
+-- Sala de Exames (Local 5)
 (2, 3, 'Local', 5, NULL, NULL),   -- Curativo na sala de exames
-(3, 10, 'Local', 3, NULL, NULL);  -- Chave do 2º andar na farmácia
+(15, 7, 'Local', 5, NULL, NULL),  -- Machado na sala de exames
+(16, 8, 'Local', 5, NULL, NULL),  -- Bandagem na sala de exames
+
+-- Corredor Leste (Local 6)
+(7, 4, 'Local', 6, NULL, NULL),   -- Kit Médico no corredor leste
+(17, 6, 'Local', 6, NULL, NULL),  -- Pistola no corredor leste (rara!)
+(18, 3, 'Local', 6, NULL, NULL),  -- Curativo no corredor leste
+
+-- Almoxarifado (Local 7)
+(5, 5, 'Local', 7, NULL, NULL),   -- Poção de Cura no almoxarifado
+(19, 7, 'Local', 7, NULL, NULL),  -- Machado no almoxarifado
+(20, 4, 'Local', 7, NULL, NULL),  -- Kit Médico no almoxarifado
+(21, 8, 'Local', 7, NULL, NULL),  -- Bandagem no almoxarifado
+
+-- Corredor Sul (Local 8)
+(22, 3, 'Local', 8, NULL, NULL),  -- Curativo no corredor sul
+(23, 8, 'Local', 8, NULL, NULL),  -- Bandagem no corredor sul
+
+-- Escada 2º Andar (Local 12)
+(24, 6, 'Local', 12, NULL, NULL), -- Pistola na escada (muito rara!)
+(25, 5, 'Local', 12, NULL, NULL), -- Poção de Cura na escada (muito rara!)
+(26, 4, 'Local', 12, NULL, NULL); -- Kit Médico na escada
 
 -- 🗝️ LOCAL X CHAVE
 INSERT INTO Local_Chaves (IDLocal, IDChave) VALUES (12, 10);
@@ -56,7 +108,31 @@ INSERT INTO Zumbi_Infeccioso (IDZumbiInfeccioso, Taxa_Infeccao, DanoBase) VALUES
 INSERT INTO Instancia_Zumbi (IDInstanciaZumbi, VidaAtual, IDLocal, IDTipoZumbi) VALUES
 (1, 50, 2, 1),   -- Comum na sala de espera
 (2, 80, 8, 2),   -- Brutamonte no corredor sul
-(3, 60, 3, 3);   -- Infeccioso na farmácia
+(3, 60, 3, 3),   -- Infeccioso na farmácia
+(4, 40, 1, 1),   -- Comum na recepção
+(5, 70, 5, 2),   -- Brutamonte na sala de exames
+(6, 55, 4, 3),   -- Infeccioso no consultório médico
+(7, 45, 6, 1),   -- Comum no corredor leste
+(8, 60, 7, 3),   -- Infeccioso no almoxarifado
+(9, 50, 12, 2);  -- Brutamonte na escada do 2º andar
+
+-- 🎁 DROPS DOS ZUMBIS
+INSERT INTO Zumbi_Drops (IDTipoZumbi, IDClasseltens, Probabilidade, Quantidade_Min, Quantidade_Max) VALUES
+-- Zumbi Comum (drops básicos)
+(1, 3, 30.0, 1, 1),    -- 30% chance de curativo
+(1, 8, 20.0, 1, 2),    -- 20% chance de bandagem (1-2)
+(1, 2, 10.0, 1, 1),    -- 10% chance de faca
+
+-- Zumbi Brutamonte (drops melhores)
+(2, 4, 25.0, 1, 1),    -- 25% chance de kit médico
+(2, 7, 15.0, 1, 1),    -- 15% chance de machado
+(2, 6, 8.0, 1, 1),     -- 8% chance de pistola (raro!)
+
+-- Zumbi Infeccioso (drops de cura)
+(3, 3, 40.0, 1, 2),    -- 40% chance de curativo (1-2)
+(3, 8, 30.0, 1, 3),    -- 30% chance de bandagem (1-3)
+(3, 4, 20.0, 1, 1),    -- 20% chance de kit médico
+(3, 5, 5.0, 1, 1);     -- 5% chance de poção de cura (muito raro!)
 
 -- 📜 MISSÕES
 INSERT INTO Missao (IDMissao, Nome, Descricao, Recompensa, Status, Tipo, Parametros, TipoRecompensa) VALUES
