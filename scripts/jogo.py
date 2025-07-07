@@ -1,6 +1,8 @@
 import psycopg2
 import random
 import os
+import time
+import sys
 
 # Conexão com o banco
 conn = psycopg2.connect(
@@ -846,8 +848,48 @@ def menu_jogo(jogador):
             break
         else:
             print("Opção inválida.")
+        
+def digitar(texto, delay=0.02):
+    for caractere in texto:
+        sys.stdout.write(caractere)
+        sys.stdout.flush()
+        time.sleep(delay)
+    print()  # Pula linha ao final
+
+def titulo_animado(texto):
+    print("=" * len(texto))
+    digitar(texto.upper(), delay=0.08)
+    print("=" * len(texto))
+    print()
 
 clear_terminal()
+
+titulo_animado("🧟 ZUMBI: A Última Esperança 🩸")
+
+introducao = """
+Você acorda desorientado na recepção de um hospital destruído. 
+O som distante de passos arrastados ecoa pelos corredores. 
+O cheiro forte de desinfetante não consegue esconder o odor de morte que preenche o ar. 
+Sangue nas paredes. Salas reviradas. Zumbis à espreita em cada esquina.
+
+Tudo o que você tem é sua determinação…
+E uma missão clara: encontrar sua filha, viva, no segundo andar.
+
+Mas o caminho até ela não será fácil.
+Você precisará vasculhar salas, enfrentar criaturas infectadas, coletar suprimentos e tomar decisões rápidas para sobreviver.
+
+A chave para o segundo andar está na farmácia.
+O brutamonte no corredor sul bloqueia sua passagem.
+E no fim de tudo... sua filha te espera.
+
+Você está pronto para sobreviver ao horror?
+🎮 Pressione ENTER para começar.
+"""
+
+digitar(introducao, delay=0.015)
+input()
+
+# Chama o login e fecha a conexão
 login()
 cursor.close()
-conn.close() 
+conn.close()
