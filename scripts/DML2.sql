@@ -1,15 +1,15 @@
 -- 🌍 LOCAIS DO HOSPITAL
-INSERT INTO Local VALUES (1,  'Recepção', 'Recepção do hospital', false, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (2,  'Sala de Espera', 'Sala de espera dos pacientes', false, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (3,  'Farmácia', 'Farmácia do hospital', false, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (4,  'Consultório Médico', 'Consultório para atendimento', false, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (5,  'Sala de Exames', 'Sala de exames médicos', false, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (6,  'Corredor Leste', 'Corredor do lado leste', false, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (7,  'Almoxarifado', 'Depósito de materiais', false, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (8,  'Corredor Sul', 'Corredor do lado sul', false, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (12, 'Escada 2º Andar', 'Escada para o segundo andar', true, NULL, NULL, NULL, NULL);
-INSERT INTO Local VALUES (13, 'Quarto da Filha', 'Quarto onde está a filha', false, NULL, NULL, NULL, NULL);
-
+-- 🌍 LOCAIS DO HOSPITAL (DESCRIÇÕES IMERSIVAS)
+INSERT INTO Local VALUES (1, 'Recepção', 'O hall de entrada está em caos total. Balcões destruídos, papéis espalhados e manchas suspeitas no chão. O cheiro de desinfetante misturado com algo pior enche o ar.', false, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (2, 'Sala de Espera', 'Cadeiras viradas, revistas rasgadas e sinais de luta por toda parte. O televisor ainda pisca estáticamente, iluminando o ambiente com uma luz fantasmagórica.', false, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (3, 'Farmácia', 'Prateleiras saqueadas, vidros quebrados e remédios espalhados. O cheiro forte de medicamentos se mistura com o odor de carne podre vindo do refrigerador de vacinas.', false, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (4, 'Consultório Médico', 'A maca está manchada de sangue, instrumentos cirúrgicos espalhados e paredes com arranhões profundos. O poster anatômico na parede foi rasgado violentamente.', false, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (5, 'Sala de Exames', 'Equipamentos médicos destruídos, monitores com telas quebradas e um forte cheiro de queimado. O aparelho de raio-X emite um zumbido perturbador.', false, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (6, 'Corredor Leste', 'Luzes piscando, paredes com marcas de sangue e portas arrombadas. O chão está coberto de detritos e o som de passos arrastados ecoa à distância.', false, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (7, 'Almoxarifado', 'Poeira espessa cobre caixas e equipamentos médicos. O ar é pesado e mofado. Barulhos estranhos vêm das prateleiras mais profundas.', false, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (8, 'Corredor Sul', 'Paredes com marcas de garras profundas e poças de líquidos não identificados. Uma cadeira de rodas amassada bloqueia parcialmente a passagem.', false, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (12, 'Escada 2º Andar', 'Degraus manchados de sangue levam ao andar superior. O corrimão está dobrado em ângulos não naturais. Um silêncio pesado paira no ar.', true, NULL, NULL, NULL, NULL);
+INSERT INTO Local VALUES (13, 'Quarto da Filha', 'Um quarto de hospital infantil, com paredes pintadas de azul e adesivos de animais. O berço está revirado e um urso de pelúcia ensanguentado jaz no chão.', false, NULL, NULL, NULL, NULL);
 UPDATE Local SET Norte=2, Sul=8, Leste=6, Oeste=5 WHERE IDLocal=1;
 UPDATE Local SET Sul=1, Leste=3, Oeste=4 WHERE IDLocal=2;
 UPDATE Local SET Sul=6, Oeste=2 WHERE IDLocal=3;

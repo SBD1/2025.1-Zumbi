@@ -75,20 +75,6 @@ CREATE TABLE Medicamentos (
     FOREIGN KEY (IDClasseltens) REFERENCES Classeltens(IDClasseltens)
 );
 
--- Tabela Dialogos
-CREATE TABLE Dialogos (
-    IDDialogo INT PRIMARY KEY,
-    Titulo VARCHAR(255)
-);
-
--- Tabela MensagensDialogos
-CREATE TABLE MensagensDialogos (
-    IDMensagemDialogo INT PRIMARY KEY,
-    Texto TEXT,
-    Ordem_de_Exibicao INT,
-    IDDialogo INT,
-    FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
-);
 
 -- Tipo ENUM para origem de itens
 CREATE TYPE origem_item AS ENUM ('Personagem', 'Local');
@@ -166,13 +152,6 @@ CREATE TABLE Personagem_Missao (
     FOREIGN KEY (IDMissao) REFERENCES Missao(IDMissao)
 );
 
-CREATE TABLE Dialogos_Missao (
-    IDDialogo INT,
-    IDMissao INT,
-    PRIMARY KEY (IDDialogo, IDMissao),
-    FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo),
-    FOREIGN KEY (IDMissao) REFERENCES Missao(IDMissao)
-);
 
 CREATE TABLE Local_Chaves (
     IDLocal INT,
@@ -182,13 +161,6 @@ CREATE TABLE Local_Chaves (
     FOREIGN KEY (IDChave) REFERENCES Chaves(IDClasseltens)
 );
 
-CREATE TABLE Personagem_Dialogos (
-    IDPersonagem INT,
-    IDDialogo INT,
-    PRIMARY KEY (IDPersonagem, IDDialogo),
-    FOREIGN KEY (IDPersonagem) REFERENCES Personagem(IDPersonagem),
-    FOREIGN KEY (IDDialogo) REFERENCES Dialogos(IDDialogo)
-);
 
 -- Trigger para garantir que a vida do personagem seja atualizada corretamente
 CREATE OR REPLACE FUNCTION atualizar_vida_personagem()

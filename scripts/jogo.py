@@ -89,33 +89,51 @@ def CriarPersonagem(jogador):
         input("Pressione Enter para continuar...")
         return
     try:
+        # Inicia uma transação
+        conn.autocommit = False
+        
+        # Cria o personagem
         cursor.execute(
             'INSERT INTO Personagem (Nome, VidaAtual, IDConta, IDLocal) VALUES (%s, %s, %s, %s) RETURNING IDPersonagem',
             (nome_personagem, 100, jogador[0], 1))
         id_personagem = cursor.fetchone()[0]
-        # Dá um item inicial (exemplo: faca, IDClasseltens=2)
+        
+        # Dá um item inicial (faca, IDClasseltens=2)
         cursor.execute('SELECT COALESCE(MAX(IDInstanciaItem), 0) + 1 FROM Instancias_Itens')
         novo_id_item = cursor.fetchone()[0]
         cursor.execute(
             'INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDPersonagem, Municao) VALUES (%s, %s, %s, %s, %s)',
             (novo_id_item, 2, 'Personagem', id_personagem, None))
+        
+        # Adiciona as missões padrão (1, 2 e 3)
+        cursor.execute('''
+            INSERT INTO Personagem_Missao (IDPersonagem, IDMissao, Status)
+            VALUES (%s, 1, 'ATIVA'), (%s, 2, 'ATIVA'), (%s, 3, 'ATIVA')
+        ''', (id_personagem, id_personagem, id_personagem))
+        
+        # Confirma a transação
         conn.commit()
+        conn.autocommit = True
+        
         personagem_selecionado = id_personagem
         print(f"\n✅ Personagem '{nome_personagem}' criado com sucesso!")
         print("Você recebeu uma faca como item inicial!")
+        print("Missões iniciais atribuídas!")
         input("\nPressione Enter para continuar...")
         return
     except psycopg2.Error as e:
         conn.rollback()
+        conn.autocommit = True
         print(f"\n❌ Erro ao criar personagem: {e}")
         input("Pressione Enter para continuar...")
 
 def Mapa():
     global personagem_selecionado
+    verificar_conclusao_missoes()
     clear_terminal()
     cursor.execute(
         """
-        SELECT p.Nome, l.Nome, l.IDLocal
+        SELECT p.Nome, l.Nome, l.IDLocal, l.Descricao
         FROM Personagem p 
         JOIN Local l 
         ON l.IDLocal = p.IDLocal 
@@ -125,23 +143,24 @@ def Mapa():
     )
     resultado = cursor.fetchone()
     if resultado:
-        nome_personagem, local_nome, id_local = resultado
+        nome_personagem, local_nome, id_local, descricao_local = resultado
         print(f"\nLocal Atual: {local_nome}")
-        print(f"Personagem: {nome_personagem}")
+        print(f"\n{descricao_local}")
+        print(f"\nPersonagem: {nome_personagem}")
         if id_local == 13:
             print("\n🎉 Parabéns! Você chegou ao Quarto da Filha e salvou sua filha! Fim do jogo!\n")
             input("Pressione Enter para reiniciar...")
             personagem_selecionado = None
             login()
             return
-        # Checa se há zumbi vivo no local e inicia combate automático
-        cursor.execute('''
-            SELECT iz.IDInstanciaZumbi FROM Instancia_Zumbi iz
-            WHERE iz.IDLocal = %s AND iz.VidaAtual > 0
-        ''', (id_local,))
-        zumbi_existe = cursor.fetchone()
-        if zumbi_existe:
-            combate_pokemon_style(id_local)
+        ## Checa se há zumbi vivo no local e inicia combate automático
+        #cursor.execute('''
+         #   SELECT iz.IDInstanciaZumbi FROM Instancia_Zumbi iz
+          #  WHERE iz.IDLocal = %s AND iz.VidaAtual > 0
+        #''', (id_local,))
+        #zumbi_existe = cursor.fetchone()
+        #if zumbi_existe:
+        #    combate_pokemon_style(id_local)
     else:
         print("Personagem não encontrado ou sem local definido.")
         return
@@ -244,11 +263,24 @@ def Movimentar():
                         continue
                     else:
                         print("🔑 Chave encontrada no inventário! Porta destrancada.")
+                
+                # Antes de mover, pega a descrição do novo local
+                cursor.execute(
+                    "SELECT Descricao FROM Local WHERE IDLocal = %s",
+                    (novo_id_local,)
+                )
+                descricao_local = cursor.fetchone()[0]
+                
                 cursor.execute(
                     "UPDATE Personagem SET IDLocal = %s WHERE IDPersonagem = %s",
                     (novo_id_local, personagem_selecionado))
                 conn.commit()
-                print(f"\nMovido com sucesso para {escolha}: {nome_local}")
+                
+                # Mostra a descrição do novo local
+                clear_terminal()
+                print(f"\nVocê entrou em: {nome_local}")
+                print(f"\n{descricao_local}")
+                input("\nPressione Enter para continuar...")
                 return
         except ValueError:
             print("Por favor, digite uma direção válida.")
@@ -258,6 +290,7 @@ def Movimentar():
 
 def ver_inventario():
     global personagem_selecionado
+    verificar_conclusao_missoes()
     clear_terminal()
     cursor.execute("""
         SELECT 
@@ -480,20 +513,64 @@ def selecionar_arma(personagem_id):
 def ver_missoes():
     global personagem_selecionado
     clear_terminal()
+    
+    # Verifica conclusão de missões antes de mostrar
+    verificar_conclusao_missoes()
+    
     cursor.execute('''
-        SELECT m.Nome, m.Descricao, pm.Status
+        SELECT m.IDMissao, m.Nome, m.Descricao, pm.Status, 
+               m.Tipo, m.Parametros, m.TipoRecompensa, m.Recompensa
         FROM Personagem_Missao pm
         JOIN Missao m ON pm.IDMissao = m.IDMissao
         WHERE pm.IDPersonagem = %s
+        ORDER BY pm.Status, m.IDMissao
     ''', (personagem_selecionado,))
     missoes = cursor.fetchall()
+    
     if not missoes:
         print("\nVocê não tem missões no momento.")
         input("\nPressione Enter para continuar...")
         return
+    
     print("\n📜 SUAS MISSÕES:")
-    for nome, descricao, status in missoes:
-        print(f"- {nome} ({status})\n  {descricao}")
+    for id_missao, nome, descricao, status, tipo, parametros, tipo_recompensa, recompensa in missoes:
+        print(f"\n=== {nome} ===")
+        print(f"Status: {'✅ CONCLUÍDA' if status == 'CONCLUIDA' else '⌛ ATIVA'}")
+        print(f"Descrição: {descricao}")
+        
+        # Mostra progresso
+        if tipo == 'COLETA' and status == 'ATIVA':
+            cursor.execute('''
+                SELECT COUNT(*) FROM Instancias_Itens ii
+                JOIN Classeltens c ON ii.IDClasseltens = c.IDClasseltens
+                WHERE ii.IDPersonagem = %s AND c.tipos_itens = %s
+            ''', (personagem_selecionado, parametros['tipo_item']))
+            progresso = cursor.fetchone()[0]
+            print(f"Progresso: {progresso}/{parametros['quantidade']} {parametros['tipo_item']} coletados")
+        
+        # Mostra recompensa
+        if tipo_recompensa == 'ITEM':
+            cursor.execute('''
+                SELECT 
+                    CASE
+                        WHEN c.tipos_itens = 'ArmaDeFogo' THEN af.Nome
+                        WHEN c.tipos_itens = 'ArmaBranca' THEN ab.Nome
+                        WHEN c.tipos_itens = 'Medicamentos' THEN m.Nome
+                        WHEN c.tipos_itens = 'Chave' THEN ch.Nome_Chave
+                        ELSE 'Item Desconhecido'
+                    END AS NomeItem
+                FROM Classeltens c
+                LEFT JOIN ArmaDeFogo af ON af.IDClasseltens = c.IDClasseltens AND c.tipos_itens = 'ArmaDeFogo'
+                LEFT JOIN ArmaBranca ab ON ab.IDClasseltens = c.IDClasseltens AND c.tipos_itens = 'ArmaBranca'
+                LEFT JOIN Medicamentos m ON m.IDClasseltens = c.IDClasseltens AND c.tipos_itens = 'Medicamentos'
+                LEFT JOIN Chaves ch ON ch.IDClasseltens = c.IDClasseltens AND c.tipos_itens = 'Chave'
+                WHERE c.IDClasseltens = %s
+            ''', (recompensa,))
+            item_recompensa = cursor.fetchone()[0]
+            print(f"Recompensa: {item_recompensa}")
+        else:
+            print(f"Recompensa: {recompensa}")
+    
     input("\nPressione Enter para continuar...")
 
 def combate_pokemon_style(id_local):
@@ -511,6 +588,7 @@ def combate_pokemon_style(id_local):
     ''', (id_local,))
     zumbis = cursor.fetchall()
     if not zumbis:
+        input("Não há zumbis para derrotar aqui, prescione Enter para continuar...")
         return
     # Busca dados do personagem
     cursor.execute('''SELECT VidaAtual, Nome FROM Personagem WHERE IDPersonagem = %s''', (personagem_selecionado,))
@@ -532,7 +610,7 @@ def combate_pokemon_style(id_local):
             print("\nO que deseja fazer?")
             print("1. Atacar")
             print("2. Fugir")
-            print("3. Inventário/Trocar arma")
+            print("3. Tomar Remedio")
             escolha = input("Escolha: ").strip()
             if escolha == "1":
                 # Selecionar arma a cada ataque
@@ -687,6 +765,49 @@ def combate_pokemon_style(id_local):
         return
     print("\nTodos os zumbis do local foram derrotados!")
     input("Pressione Enter para continuar...")
+
+def verificar_conclusao_missoes():
+    global personagem_selecionado
+    
+    if personagem_selecionado is None:
+        return
+
+    # Verifica missões de coleta
+    cursor.execute('''
+        SELECT pm.IDMissao, m.Nome, m.Tipo, m.Parametros, m.TipoRecompensa, m.Recompensa
+        FROM Personagem_Missao pm
+        JOIN Missao m ON pm.IDMissao = m.IDMissao
+        WHERE pm.IDPersonagem = %s AND pm.Status = 'ATIVA' AND m.Tipo = 'COLETA'
+    ''', (personagem_selecionado,))
+    missoes_colecao = cursor.fetchall()
+
+    for id_missao, nome, tipo, parametros, tipo_recompensa, recompensa in missoes_colecao:
+        # Verifica se o jogador coletou os itens necessários
+        cursor.execute('''
+            SELECT COUNT(*) FROM Instancias_Itens ii
+            JOIN Classeltens c ON ii.IDClasseltens = c.IDClasseltens
+            WHERE ii.IDPersonagem = %s AND c.tipos_itens = %s
+        ''', (personagem_selecionado, parametros['tipo_item']))
+        quantidade = cursor.fetchone()[0]
+
+        if quantidade >= parametros['quantidade']:
+            # Conclui a missão
+            cursor.execute('''
+                UPDATE Personagem_Missao SET Status = 'CONCLUIDA'
+                WHERE IDPersonagem = %s AND IDMissao = %s
+            ''', (personagem_selecionado, id_missao))
+            
+            # Dá a recompensa
+            if tipo_recompensa == 'ITEM':
+                cursor.execute('SELECT COALESCE(MAX(IDInstanciaItem), 0) + 1 FROM Instancias_Itens')
+                novo_id = cursor.fetchone()[0]
+                cursor.execute('''
+                    INSERT INTO Instancias_Itens (IDInstanciaItem, IDClasseltens, Localizacao, IDPersonagem)
+                    VALUES (%s, %s, 'Personagem', %s)
+                ''', (novo_id, recompensa, personagem_selecionado))
+            
+            conn.commit()
+            print(f"\n🎉 Missão '{nome}' concluída! Recompensa: {recompensa if tipo_recompensa == 'ITEM' else 'Nenhuma'}")
 
 def menu_jogo(jogador):
     global personagem_selecionado
